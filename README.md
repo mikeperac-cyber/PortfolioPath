@@ -66,13 +66,11 @@ Docker is only necessary for a fully local Supabase stack. If you choose to use 
 ## Configure the first owner safely
 
 1. Create your normal PortfolioPath account first.
-2. In a protected PowerShell session, set the three values below to your own account and hosted Supabase server credentials. Never put the server key in Vercel browser variables or source control.
+2. Keep your hosted Supabase URL and server secret in `.env.local` (they are loaded automatically and must never go into source control or a `NEXT_PUBLIC_*` variable).
 3. Run the one-time, existing-account-only bootstrap command:
 
    ```powershell
    $env:BOOTSTRAP_OWNER_EMAIL="you@example.com"
-   $env:NEXT_PUBLIC_SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
-   $env:SUPABASE_SECRET_KEY="your-server-secret"
    npm run bootstrap-owner
    ```
 

@@ -1,4 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
+import { loadEnvConfig } from "@next/env";
+
+// Uses the same local environment file as Next.js, so the bootstrap command
+// never asks an owner to paste a server secret into their terminal history.
+loadEnvConfig(process.cwd());
 
 const email = process.env.BOOTSTRAP_OWNER_EMAIL?.trim().toLowerCase();
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
