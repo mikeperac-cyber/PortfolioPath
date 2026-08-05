@@ -1,6 +1,6 @@
-import createNextIntlPlugin from "next-intl/plugin"
+import createNextIntlPlugin from "next-intl/plugin";
 
-const withNextIntl = createNextIntlPlugin("./i18n/request.ts")
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 export default withNextIntl({
   allowedDevOrigins: ["127.0.0.1"],
@@ -9,4 +9,4 @@ export default withNextIntl({
   typedRoutes: false,
   turbopack: { root: process.cwd() },
   serverExternalPackages: ["@react-pdf/renderer"],
-})
+});

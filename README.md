@@ -1,38 +1,33 @@
 # PortfolioPath
 
-PortfolioPath is a bilingual, evidence-first SaaS MVP for Turkish high-school students building authentic portfolio projects for international university applications.
+PortfolioPath is an evidence-first, bilingual platform for Turkish students preparing authentic university-application projects. It helps students plan real work, keep dated evidence, reflect in their own voice, and present factual outcomes clearly.
 
 > Build documented university portfolio projects—not artificial extracurricular activities.
 
-The application separates planned work, student-reported work, submitted evidence, counselor review, and counselor-confirmed skills. It does not generate recommendation letters, admissions predictions, fabricated achievements, or unsupported impact claims.
+PortfolioPath never creates fake activities, certificates, mentor comments, recommendation letters, admissions predictions, or unsupported impact claims.
 
-## What is included
+## Product workspaces
 
-- English and Turkish public pages, authentication, legal/ethical pages, and pricing
-- Student onboarding, deterministic three-idea generator, ten-step project wizard, project workspace, weekly planner, evidence vault, reflections, skills, feedback, portfolio, presentation, recommendation-evidence, PDF, sharing, and billing surfaces
-- Counselor roster, queue, proposal/task/evidence/reflection review, skill confirmation, comments, ethical flags, progress summaries, and subscription surface
-- Minimal administrator account, assignment, category, template, plan, flag, suspension, and settings surfaces
-- Supabase Auth/Postgres/Storage with RLS, explicit grants, append-only audit events, demo accounts, and five demo projects
-- Server-only deterministic generation and Stripe-compatible/test payment interfaces
-- Unit, database/RLS, and browser acceptance tests
+- **Student Studio** — onboarding, project ideas, blueprints, planner, evidence vault, reflections, skills, portfolio, application preparation, sharing, and billing.
+- **Counselor Practice** — assigned-student review queue, evidence and reflection review, factual feedback, skill confirmations, and progress reports.
+- **Parent View** — consented milestones, selected evidence, and counselor updates. Private reflections are never shared by default.
+- **Mentor Verification** — narrowly scoped, source-linked verification requests; never a pre-written recommendation.
+- **School Workspace** — quote-led annual organizations, seats, cohorts, staff access, templates, and aggregate completion insights.
+- **Owner Console** — live, privacy-safe operating metrics; customer access grants; school prospects; safety queue; and an isolated browser-only Student Sandbox.
 
-Excluded by design: parent/school accounts, cohorts, team projects, mentor accounts, school analytics, social features, chat/video, points/badges, scoring, admissions predictions, university matching, white-labeling, and automated recommendation letters.
+The Platform Owner is not a billable customer. An owner can switch between Owner Console, Counselor Practice, and an isolated Student Sandbox. Owner-issued **complimentary** or **manual** grants unlock a plan; a **discount** only changes the server-authorized checkout price and never unlocks tools on its own.
 
 ## Stack
 
-- Next.js App Router, React, and TypeScript
-- Tailwind CSS and shadcn/ui primitives
-- Supabase Auth, PostgreSQL, private Storage, and local Docker stack
-- next-intl request configuration for English/Turkish
-- React Hook Form + Zod
-- Deterministic `GenerationProvider`
-- Local test and Stripe-compatible `PaymentProvider`
-- React PDF renderer
-- Node test runner, pgTAP, and Playwright
+- Next.js App Router, React, TypeScript, Tailwind CSS, shadcn/ui, and next-intl
+- Hosted Supabase Auth, PostgreSQL, private Storage, RLS, and audited server operations
+- Deterministic, source-bound generation provider (a guarded live-model provider can be added later)
+- Local test, Stripe-compatible, and iyzico payment adapters
+- React PDF, Zod, React Hook Form, TanStack Table, Playwright, and Node tests
 
-## Local setup
+## Quick start with hosted Supabase (recommended)
 
-Requirements: Node.js 20+, npm, Docker Desktop, and Git.
+This project does **not** require Docker for day-to-day development or production. A hosted Supabase development project is the lightest option on a Windows machine.
 
 1. Install dependencies.
 
@@ -40,134 +35,133 @@ Requirements: Node.js 20+, npm, Docker Desktop, and Git.
    npm install
    ```
 
-2. Copy `.env.example` to `.env.local`.
+2. Copy `.env.example` to `.env.local`, then set your hosted project URL, publishable key, and server-only secret key from Supabase.
 
-3. Start Docker Desktop, then start the low-memory Supabase profile and seed it.
-
-   ```bash
-   npm run db:start:lite
-   npm run db:reset
-   ```
-
-4. Copy the `PUBLISHABLE_KEY` and `SECRET_KEY` printed by `db:start` into `.env.local`.
-
-5. Start the web application.
+3. Start the app.
 
    ```bash
    npm run dev
    ```
 
-6. Open `http://127.0.0.1:3000/en` or `/tr`.
+4. Open `http://127.0.0.1:3000/en` (or `/tr`).
 
-The lite profile keeps PostgreSQL, Auth, REST, Storage, and the API gateway. It leaves Studio, Realtime, local mail preview, image transformation, Edge Functions, analytics/logging, and connection pooling off to reduce memory use. Use `npm run db:start` when you specifically need the full local stack; Supabase Studio is then available at `http://127.0.0.1:54323` and local mail at `http://127.0.0.1:54324`.
+### Apply hosted database migrations
 
-Stop the local database with `npm run db:stop`. It preserves your local data. After stopping Docker Desktop, `wsl --shutdown` in PowerShell releases the remaining WSL virtual-machine memory. The Supabase CLI still uses Docker for local development; to avoid Docker entirely, point `.env.local` at a hosted Supabase development project and run only `npm run dev`.
+From the project folder, authenticate and link the hosted Supabase project once:
 
-### Demo credentials
+```bash
+npx supabase login
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase db push --linked
+```
 
-All local accounts use `Portfolio123!`.
+Then check **Database → Migrations** in the Supabase dashboard. On some Windows setups the CLI may print a Docker warning after completing the remote migration step; confirm the migration list and tables in the dashboard rather than re-running it blindly.
 
-| Role | Email |
-|---|---|
-| Student | `student@demo.portfoliopath.example.com` |
-| Approved counselor | `counselor@demo.portfoliopath.example.com` |
-| Administrator | `admin@demo.portfoliopath.example.com` |
+Do not run `supabase/seed.sql` against production: it is local test fixture data only. Production begins with real accounts and the managed categories, templates, skills, and plans.
 
-The seed includes Marine Observation, Local Tourism Website, Sports Leadership Documentation, Environmental Awareness, and Small Student Research projects. Evidence URLs are inert demo metadata; original production uploads always use the private `evidence` bucket.
+### Optional local Supabase
+
+Docker is only necessary for a fully local Supabase stack. If you choose to use it, the low-memory profile is available through `npm run db:start:lite`. It is optional and is not required for hosted Supabase, Vercel, or normal local UI work.
+
+## Configure the first owner safely
+
+1. Create your normal PortfolioPath account first.
+2. In a protected PowerShell session, set the three values below to your own account and hosted Supabase server credentials. Never put the server key in Vercel browser variables or source control.
+3. Run the one-time, existing-account-only bootstrap command:
+
+   ```powershell
+   $env:BOOTSTRAP_OWNER_EMAIL="you@example.com"
+   $env:NEXT_PUBLIC_SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
+   $env:SUPABASE_SECRET_KEY="your-server-secret"
+   npm run bootstrap-owner
+   ```
+
+The command refuses to create a new account, grants `platform_owner`, `counselor`, and `student` roles to that exact existing account, writes an audit record, and asks you to sign out/in again. It must never be run with an unknown email.
 
 ## Environment variables
 
-Required in production:
+Required in Vercel and in a hosted local setup:
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_SECRET_KEY` (server only)
-- `NEXT_PUBLIC_APP_URL`
-- `SHARE_TOKEN_SECRET` (at least 32 random characters)
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SECRET_KEY=
+NEXT_PUBLIC_APP_URL=
+SHARE_TOKEN_SECRET=
+GENERATION_PROVIDER=template
+PAYMENT_PROVIDER=test
+```
 
-Generation defaults to `template`. Payments default to `test`. To enable Stripe-compatible checkout, set `PAYMENT_PROVIDER=stripe`, the Stripe secret/webhook values, and the three price IDs listed in `.env.example`.
+`SUPABASE_SECRET_KEY`, payment secrets, and `SHARE_TOKEN_SECRET` are server-only. Do not prefix them with `NEXT_PUBLIC_`; do not commit `.env.local`.
 
-Never expose the Supabase secret key or Stripe secret to the browser. Never commit `.env.local`.
+### Payment modes
+
+- `PAYMENT_PROVIDER=test` — full local checkout testing without charging anyone.
+- `PAYMENT_PROVIDER=stripe` — keeps the existing Stripe-compatible adapter available.
+- `PAYMENT_PROVIDER=iyzico` — uses iyzico hosted checkout for Turkey. Set `IYZICO_API_KEY`, `IYZICO_SECRET_KEY`, and `IYZICO_BASE_URL` (`https://sandbox-api.iyzipay.com` while testing). Counselor subscriptions also require `IYZICO_COUNSELOR_PRICING_PLAN_REFERENCE_CODE` from an active iyzico pricing plan.
+
+For iyzico, configure the deployed callback route and signed webhook route in the merchant console:
+
+- Checkout callback: `https://YOUR_DOMAIN/api/billing/iyzico/callback`
+- Webhook: `https://YOUR_DOMAIN/api/billing/webhook`
+
+The app verifies provider callbacks and webhooks server-side, records payment sessions idempotently, and never stores card details or billing addresses in the PortfolioPath database. iyzico receives payer details only to perform its hosted checkout.
+
+## Commercial plans
+
+| Customer  | Plan                      | Launch price | Access                                                         |
+| --------- | ------------------------- | -----------: | -------------------------------------------------------------- |
+| Student   | Free Readiness Assessment |           ₺0 | profile and one direction                                      |
+| Student   | Project Blueprint         |  ₺1,200 once | three ideas and one complete blueprint                         |
+| Student   | Complete Portfolio        |  ₺5,500 once | up to three projects and the full student suite                |
+| Counselor | Counselor Professional    | ₺2,500/month | up to 25 active students, reviews, templates, reports          |
+| School    | School Partnership        | annual quote | organization seats, cohorts, counselors, reporting, onboarding |
+| Owner     | Internal Owner Access     |           ₺0 | owner tools and intentional per-customer grants                |
+
+Parents and mentors are consent-based participants, not separately sold plans. Schools are quote-led—there is no self-service school checkout.
+
+## Security and privacy boundaries
+
+- Files are private by default in the `evidence` bucket and use short-lived signed URLs.
+- Every user-owned table has RLS. Students see only their work; counselors only assigned students; school staff only their organization; mentors only their assigned verification requests.
+- Parents can see only consented summaries and selected evidence, never private reflections by default.
+- Owner access and sensitive operations are audit logged; commercial aggregate metrics never expose reflection, evidence, or counselor-comment contents.
+- Private share links keep only token hashes, default to 30 days, cap at 90 days, and are immediately revocable.
+- Generation is source-bound and factual. Plans remain planned until evidence supports completion.
+
+See [architecture notes](docs/ARCHITECTURE.md), [security notes](docs/SECURITY.md), and the [AI and launch specification](docs/PORTFOLIOPATH_AI_LAUNCH_SPEC.md).
 
 ## Commands
 
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Local Next.js server |
-| `npm run build` | Production build |
-| `npm run typecheck` | TypeScript validation |
-| `npm run lint` | ESLint with zero warnings |
-| `npm test` | Unit tests |
-| `npm run test:e2e` | Playwright public/browser journeys |
-| `npm run db:start:lite` | Start low-memory local Supabase (recommended) |
-| `npm run db:start` | Start the full local Supabase stack |
-| `npm run db:stop` | Stop local Supabase and preserve its data |
-| `npm run db:reset` | Recreate schema and seed |
-| `npm run db:test` | pgTAP schema and RLS role tests |
-| `npm run db:types` | Regenerate Supabase database types |
-| `npm run bootstrap-admin` | Create a production administrator using server credentials |
+| Command                   | Purpose                                                                       |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `npm run dev`             | Start the local Next.js server                                                |
+| `npm run build`           | Create a production build                                                     |
+| `npm run typecheck`       | Check TypeScript                                                              |
+| `npm run lint`            | Run ESLint with zero warnings allowed                                         |
+| `npm test`                | Run unit tests                                                                |
+| `npm run test:e2e`        | Run Playwright journeys                                                       |
+| `npm run bootstrap-owner` | One-time explicit promotion of an existing owner account                      |
+| `npm run bootstrap-admin` | Create a separate administrator account from a protected operator environment |
+| `npm run db:start:lite`   | Optional low-memory local Supabase profile (Docker required)                  |
+| `npm run db:stop`         | Stop local Supabase without deleting its data                                 |
 
-## Database and storage
+## Deploy to Vercel + hosted Supabase
 
-The migration is in `supabase/migrations/20260805013259_initial_portfoliopath_schema.sql`; demo data is in `supabase/seed.sql`.
+1. Push this repository to GitHub and import it into Vercel.
+2. Create or select the hosted Supabase project; link it and apply migrations as above.
+3. In Supabase Auth, add your production and preview domains to the redirect URL allowlist.
+4. In Vercel, add the required environment variables for **Production** (and Preview only when intentional). Redeploy after saving them.
+5. Set `NEXT_PUBLIC_APP_URL` to your canonical production URL.
+6. Set up your owner with `npm run bootstrap-owner` from a protected local operator environment.
+7. Keep `PAYMENT_PROVIDER=test` until iyzico sandbox checkout, signed webhook delivery, cancellation, and receipts have been verified. Only then configure live iyzico credentials and webhook signing.
 
-- Every exposed user-owned table has RLS.
-- Students see their records only.
-- Approved counselors see active assignments only.
-- Pending and unassigned counselors see no student projects.
-- Administrators can inspect evidence only when it belongs to an open/reviewing content flag.
-- Storage objects are private and scoped as `{studentId}/{projectId}/{uuid}-{safeFileName}`.
-- Upload routes validate ownership, plan access, MIME type, extension, and 25 MiB limit before issuing short-lived signed URLs.
-- Share links store a SHA-256 token hash, default to 30 days in the UI, cap at 90 days, and can be revoked immediately.
-- Audit records have no client insert/update/delete grants and are written by database triggers.
+## Release checklist
 
-## Generation and ethical behavior
-
-`GenerationProvider` returns structured data with source record IDs, warnings, an editable-guidance label, and a factual-confirmation requirement. The launch provider is deterministic and does not call a live model.
-
-Project suggestions are explicitly future plans. Recommendation evidence includes the required warning and is not a letter. Unsupported superlatives are blocked before project submission. Publishing, PDF export, and sharing require factual-accuracy confirmation.
-
-## Payments
-
-`PaymentProvider` has local and Stripe-compatible implementations. Checkout is server-authorized by role. Webhooks are signature-verified by the selected provider, deduplicated by provider event ID, and write server-owned payment/subscription records. The seeded prices are:
-
-- Free Assessment: ₺0
-- Project Blueprint: ₺1,200 one-time
-- Complete Student Portfolio: ₺5,500 one-time
-- Counselor Professional: ₺2,500/month, 25 active assignments
-
-## Admin product and commercial insights
-
-The administrator overview reads live aggregate data from an administrator-only database function. It shows the student activation funnel, projects/evidence/portfolio activity, pending operational work, active paid accounts, active plan mix, and recognized TRY payment revenue. Revenue includes only completed payment records and does not invent forecasts.
-
-The endpoint never returns student names, reflections, evidence files, or evidence content. Marketing attribution and page-level behavior are not inferred. A consent-aware analytics provider can be added later if acquisition-channel and campaign analysis becomes necessary for selling the product.
-
-## Deployment: Vercel + hosted Supabase
-
-1. Create a hosted Supabase project and link the CLI.
-2. Apply migrations with `supabase db push`; seed production templates/plans separately. Do not seed demo auth users in production.
-3. Create the private `evidence` bucket with the migration settings and verify RLS.
-4. Configure Supabase Auth redirect URLs for the Vercel production and preview domains.
-5. Add all required environment variables to Vercel. Keep server secrets out of preview environments unless needed.
-6. Run `BOOTSTRAP_ADMIN_EMAIL=... BOOTSTRAP_ADMIN_PASSWORD=... npm run bootstrap-admin` once from a protected operator environment.
-7. Configure Stripe products/prices and point its webhook to `/api/billing/webhook`.
-8. Deploy to Vercel, run the checklist below, then rotate bootstrap credentials.
-
-Deployment rehearsal acceptance: `npm run build`, migration push/reset on staging, auth callback, signed upload/download, test checkout/webhook, PDF, share expiry/revocation, and role isolation must all pass before production promotion.
-
-## Test checklist
-
-- [x] Type checking, linting, production build
-- [x] Unit tests: schemas/domain helpers, lifecycle, entitlements, ethics, tokens, source filtering, generation, file validation
-- [x] Clean Supabase reset and seed
-- [x] pgTAP: RLS enabled, policies present, student, unrelated user, assigned/unassigned/pending counselor, administrator, anonymous
-- [x] Local Playwright: public routes, role-gated login, desktop/mobile layouts, and visual captures
-- [ ] Rerun Playwright on each deployment target
-- [ ] Student: signup → onboarding → ideas → wizard → evidence/reflection → portfolio share/revoke
-- [ ] Counselor: signup → approval → assignment → proposal/evidence review → skill confirmation
-- [ ] Admin: activation → assignment → template/plan/flag/suspension
-- [ ] Billing: plan limits, test checkout, repeated webhook, upgrade, portal/cancellation
-- [ ] Security: MIME spoofing, oversized upload, cross-student object access, XSS, unsupported URL, expired/revoked token
-- [ ] Accessibility: keyboard, visible focus, headings, contrast, reduced motion, loading/error/empty states, mobile, Turkish overflow
-
-See `docs/ARCHITECTURE.md` and `docs/SECURITY.md` for implementation boundaries.
+- [ ] `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` are clean.
+- [ ] Hosted migration appears in Supabase and RLS policies are enabled.
+- [ ] Student, assigned counselor, unassigned counselor, parent, mentor, school staff, owner, and anonymous access boundaries are tested.
+- [ ] A complementary grant unlocks only its intended plan; a discount changes checkout price but not entitlement.
+- [ ] Upload type/size checks, signed download authorization, expired/revoked share links, and rate limits are verified.
+- [ ] iyzico sandbox callback, V3-signed webhook, duplicate webhook, and counselor cancellation are verified before live payments.
+- [ ] Mobile, keyboard, contrast, Turkish overflow, loading, error, and empty states are reviewed.

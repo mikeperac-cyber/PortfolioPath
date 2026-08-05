@@ -19,6 +19,7 @@ export async function MarketingHeader({ locale }: { locale: string }) {
           <Link href={`/${locale}/how-it-works`} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary">{t("how")}</Link>
           <Link href={`/${locale}/students`} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary">{t("students")}</Link>
           <Link href={`/${locale}/counselors`} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary">{t("counselors")}</Link>
+          <Link href={`/${locale}/schools`} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary">{locale === "tr" ? "Okullar" : "Schools"}</Link>
           <Link href={`/${locale}/pricing`} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-primary">{t("pricing")}</Link>
         </nav>
         <div className="ml-auto flex min-w-0 items-center gap-1 sm:gap-2">

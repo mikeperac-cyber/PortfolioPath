@@ -23,6 +23,8 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
   const selectedRole = search.get("role") === "counselor" ? "counselor" : "student"
+  const requestedNext = search.get("next")
+  const safeNext = requestedNext?.startsWith(`/${locale}/`) ? requestedNext : null
   const form = useForm<SignupValues>({
     resolver: zodResolver(mode === "login" ? loginSchema : signupSchema) as unknown as Resolver<SignupValues>,
     defaultValues: { fullName: "", email: "", password: "", role: selectedRole, locale },
@@ -35,17 +37,21 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     if (mode === "login") {
       const { data, error } = await supabase.auth.signInWithPassword({ email: values.email, password: values.password })
       if (error) { toast.error(error.message); setBusy(false); return }
-      const { data: profile } = await supabase.from("users").select("role,status").eq("id", data.user.id).single()
+      const [{ data: profile }, { data: grants }] = await Promise.all([
+        supabase.from("users").select("role,status").eq("id", data.user.id).single(),
+        supabase.from("user_role_grants").select("role").eq("user_id", data.user.id).eq("active", true).is("revoked_at", null),
+      ])
       if (profile?.status === "suspended") { router.push(`/${locale}/account-suspended`); return }
-      const home = profile?.role === "administrator" ? "admin" : profile?.role ?? "student"
-      router.push(`/${locale}/${home}/dashboard`)
+      const roles = new Set([profile?.role, ...(grants ?? []).map((grant) => grant.role)])
+      const home = roles.has("platform_owner") ? "owner" : roles.has("administrator") ? "admin" : roles.has("counselor") ? "counselor" : roles.has("parent") ? "parent" : roles.has("mentor") ? "mentor" : roles.has("school_admin") || roles.has("school_counselor") ? "school" : "student"
+      router.push(safeNext ?? `/${locale}/${home}/dashboard`)
       router.refresh()
       return
     }
     const { error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
-      options: { data: { full_name: values.fullName, requested_role: values.role, locale: values.locale }, emailRedirectTo: `${window.location.origin}/auth/callback?next=/${locale}/${values.role}/dashboard` },
+      options: { data: { full_name: values.fullName, requested_role: values.role, locale: values.locale }, emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext ?? `/${locale}/${values.role}/dashboard`)}` },
     })
     if (error) { toast.error(error.message); setBusy(false); return }
     toast.success(values.role === "counselor" ? "Account created. Administrator approval is required." : "Account created. Check your email if confirmation is enabled.")

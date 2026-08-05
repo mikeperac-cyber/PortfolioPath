@@ -6,4 +6,13 @@ export const evidenceStatuses = ["pending", "accepted", "clarification_requested
 export type EvidenceStatus = (typeof evidenceStatuses)[number]
 export type SkillStatus = "target" | "evidence_supported" | "counselor_confirmed"
 export type Provenance = { sourceRecordIds: string[]; guidanceLabel: string; warnings: string[]; requiresFactualConfirmation: true }
-export type GenerationType = "project_ideas" | "presentation" | "recommendation_evidence" | "progress_summary"
+export type GenerationType =
+  | "project_ideas"
+  | "project_blueprint"
+  | "reflection_support"
+  | "portfolio_text"
+  | "presentation"
+  | "recommendation_evidence"
+  | "personal_statement_connection"
+  | "interview_preparation"
+  | "progress_summary"

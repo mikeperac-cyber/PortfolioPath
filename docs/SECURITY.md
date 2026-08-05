@@ -1,42 +1,46 @@
 # Security notes
 
-## Authorization
+## Identity and access
 
-Authentication is Supabase-based. Role and account status are read from `public.users`, not mutable `user_metadata`. Counselor accounts begin pending; administrators are created only through a service credential bootstrap.
+Supabase Auth authenticates the account. `public.users` carries account status; `public.user_role_grants` carries server-managed roles. Neither client-submitted role fields nor editable auth metadata grant access.
 
-Protected layouts and API routes authorize server-side. PostgreSQL RLS is the final boundary. pgTAP tests cover owner, unrelated user, assigned/unassigned/pending counselor, administrator, and anonymous sessions.
+Roles are enforced three times: in protected route layouts, in server API handlers, and through PostgreSQL RLS. The Owner role is never self-service: the bootstrap script requires an exact pre-existing email and a service credential, then writes an audit record.
 
-## Evidence privacy
+## Minimum-necessary access
 
-The `evidence` bucket is private. File paths begin with the authenticated student ID. The server checks project ownership, matching MIME/extension, allowed type, and a 25 MiB cap before signing. Downloads expire after 60 seconds.
+- Students access their own projects and evidence.
+- Counselors access actively assigned students only.
+- Parents access only consented project progress, selected evidence, and permitted updates—never private reflections by default.
+- Mentors access only their own assigned verification requests and source references.
+- School staff are constrained to organization memberships and cohorts in their organization.
+- Platform Owner data access is audited; commercial insights return counts and lifecycle signals, not evidence files, reflections, or counselor-comment contents.
 
-Administrators do not receive routine private-evidence access. Metadata and object access require an open/reviewing flag. Sensitive access and changes are audit logged.
+## Evidence and sharing
 
-Production should add asynchronous malware scanning and quarantine before counselor downloads; signed-upload validation is not a malware scanner.
+The `evidence` bucket is private. Object paths begin with the student and project IDs. The server validates ownership, plan access, MIME/extension consistency, allowed type, and a 25 MiB cap before issuing short-lived signed uploads/downloads.
 
-## Sharing
+Public share tokens are returned once, stored only as hashes, expire in 1–90 days, and are immediately revocable. A public share page resolves one token server-side and returns selected portfolio data only; it never gives the browser broad database access.
 
-Raw share tokens are returned once and never stored. The database stores a salted SHA-256 hash. Links expire in 1–90 days and are immediately revocable. The public route uses a server credential only to resolve one token and returns visible portfolio sections—never a general database client.
+## Generation ethics
 
-## Generation
-
-Generation routes are authenticated and rate-limited by recent persisted requests. The launch provider is deterministic. Outputs record source IDs, input hash, warnings, provider, and factual-confirmation requirements. No counselor observation or recommendation prose is invented.
+Generation receives only authorized source record IDs. Outputs record source IDs, source state, input hash, provider, warnings, unsupported-claim flags, and factual-confirmation requirements. Planned work stays planned until evidence supports completion. The system never invents achievements, impact numbers, participants, partnerships, certificates, emotions, mentor/counselor observations, recommendations, admissions outcomes, or scholarship outcomes.
 
 ## Billing
 
-Checkout requires the correct user role. Stripe webhooks require signatures; provider event IDs are unique for idempotency. Payment and subscription tables are server-owned and have client mutations revoked.
+Checkout is server-authorized by role, entitlement, plan, and rate limit. The checkout server creates a short-lived payment session before calling a provider. Payment records, subscriptions, invoices/receipts, and grants are server-owned and client writes are revoked.
+
+The test provider is safe for development only. Stripe uses verified webhook signatures. iyzico uses its documented IYZWSv2 server authorization protocol and verifies signed V3 webhook payloads. Provider event IDs and payment-session state make fulfillment idempotent. PortfolioPath does not persist card details or billing addresses; iyzico receives payer information only for its hosted payment form.
 
 ## Audit integrity
 
-Audit logs are append-only to clients. Database triggers cover project/evidence/assignment/share/flag/user/review/confirmation/billing/generation changes. Service operations may have a null database `auth.uid`; production operators should also attach request or job correlation IDs in application monitoring.
+Clients cannot append, modify, or delete audit records. Database triggers capture sensitive record changes; explicit server operations record role grants, access grants, invitations, payment state, and owner actions. Service operations can have no database `auth.uid`, so application monitoring should add request/job correlation identifiers in production.
 
 ## Production hardening checklist
 
-- Use unique production secrets and rotate bootstrap credentials.
-- Enable Supabase leaked-password protection and MFA for administrators.
-- Add edge/distributed rate limiting; the database-backed generation limit is the fallback.
-- Configure CSP, HSTS, secure cookies, webhook replay monitoring, error monitoring, and alerting.
-- Run malware scanning and image metadata review.
-- Test backups and point-in-time recovery.
-- Complete Turkish KVKK, age-appropriate consent, privacy, retention, deletion, and international-transfer legal review.
-- Perform a penetration test before processing real student evidence.
+- Use unique production secrets; rotate service and bootstrap credentials.
+- Enable Supabase leaked-password protection and MFA for owner/admin operators.
+- Use a distributed edge rate-limit provider when traffic grows; in-process limits are a safe baseline, not a multi-region solution.
+- Configure CSP, HSTS, secure cookies, alerting, error monitoring, webhook replay monitoring, and backup/restore drills.
+- Add malware scanning/quarantine and image metadata review before routine counselor downloads.
+- Test expired/revoked links, cross-student access, role escalation, payment replays, provider outages, XSS, URL validation, and file MIME spoofing.
+- Complete Turkish KVKK, age-appropriate consent, deletion/retention, and international-transfer legal review before handling real student data at scale.

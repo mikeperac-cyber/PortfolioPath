@@ -18,12 +18,13 @@
     "db:reset": "supabase db reset --local",
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local > lib/supabase/database.types.ts",
-    "bootstrap-admin": "tsx scripts/bootstrap-admin.ts"
+    "bootstrap-admin": "tsx scripts/bootstrap-admin.ts",
+    "bootstrap-owner": "tsx scripts/bootstrap-owner.ts"
   },
   "dependencies": {
-    "@hookform/resolvers": "5.7.1",
     "@fontsource/inter": "5.2.8",
     "@fontsource/sora": "5.2.8",
+    "@hookform/resolvers": "5.7.1",
     "@react-pdf/renderer": "4.5.1",
     "@supabase/ssr": "0.12.4",
     "@supabase/supabase-js": "2.112.0",
@@ -45,10 +46,10 @@
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
-    "autoprefixer": "10.4.21",
     "@types/node": "24.10.0",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
+    "autoprefixer": "10.4.21",
     "eslint": "9.39.1",
     "eslint-config-next": "16.3.0",
     "jsdom": "27.2.0",

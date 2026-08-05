@@ -2,41 +2,52 @@
 
 ## Route boundaries
 
-- `app/[locale]/(public)`: acquisition, pricing, policy, privacy, and terms
-- `app/[locale]/(auth)`: Supabase login/registration
-- `app/[locale]/(app)/student`: student-only workspace
-- `app/[locale]/(app)/counselor`: approved-counselor workspace
-- `app/[locale]/(app)/admin`: administrator workspace
-- `app/share/[token]`: server-resolved, tokenized, minimal portfolio projection
-- `app/api`: authorized generation, storage, PDF, sharing, project, and billing routes
+- `app/[locale]/(public)` — bilingual acquisition, pricing, parent/school paths, policies, assessment, and quote requests.
+- `app/[locale]/(auth)` — Supabase login, registration, and callbacks.
+- `app/[locale]/(app)/student` — Student Studio.
+- `app/[locale]/(app)/counselor` — assigned-student Counselor Practice.
+- `app/[locale]/(app)/parent` — consented family progress view.
+- `app/[locale]/(app)/mentor` — narrowly scoped verification inbox.
+- `app/[locale]/(app)/school` — organization-scoped school workspace.
+- `app/[locale]/(app)/owner` — Platform Owner console and isolated local-only student sandbox.
+- `app/[locale]/(app)/admin` — essential platform administration.
+- `app/share/[token]` — server-resolved, tokenized, minimal portfolio projection.
+- `app/api` — authorized mutations, generation, signed storage, sharing, billing, payment callbacks, and commercial operations.
 
-Server layouts call `requireRole`. API handlers call `getApiContext`; neither trusts client role metadata. Supabase session validation uses `getClaims`, and authorization is repeated in RLS.
+Layouts call `requireRole`; APIs call `getApiContext`; neither trusts editable auth metadata. Session claims identify the account, public profile and server-managed role grants determine access, and PostgreSQL RLS remains the final data boundary.
+
+## Roles and contexts
+
+`platform_owner`, `administrator`, `counselor`, `student`, `parent`, `mentor`, `school_admin`, and `school_counselor` are stored in `user_role_grants`, not user-editable metadata. The original `users.role` is retained for backwards compatibility while roles migrate safely.
+
+- A Platform Owner may use Owner Console, Counselor Practice, and a browser-only Student Sandbox. Owner status is granted only by an explicit service-role bootstrap operation.
+- A counselor sees only actively assigned students.
+- A parent sees only student-consented progress summaries, selected evidence, and permitted updates; reflections are not a parent data source.
+- A mentor sees only verification requests assigned to them.
+- School staff access only their own organization, memberships, cohorts, templates, and aggregate completion signals.
 
 ## Provider contracts
 
-`GenerationProvider` supports project ideas, presentations, recommendation evidence, and progress summaries. All results carry provenance and require factual review. A later model provider must preserve the same structured contract and ethics filtering.
+`GenerationProvider` supports `project_ideas`, `project_blueprint`, `reflection_support`, `portfolio_text`, `presentation`, `recommendation_evidence`, `personal_statement_connection`, `interview_preparation`, and `progress_summary`. Every response is structured, source-linked, editable guidance and requires factual confirmation.
 
-`PaymentProvider` supports checkout, customer portal, and verified webhooks. The local adapter keeps development functional; the Stripe-compatible adapter is selected through environment configuration.
+`PaymentProvider` provides server-created checkout, portal/cancellation capability, and signature-verified webhooks. The project includes a test adapter, Stripe-compatible adapter, and iyzico hosted-checkout adapter. The first release remains deterministic; a future live-model provider must preserve schema validation, ethical filtering, provenance, and fallback behavior.
 
 ## Data flow
 
-1. Supabase Auth creates a public profile row through a restricted trigger.
-2. Student source records are written through validated forms and RLS.
-3. Counselor decisions and confirmations are separate immutable-attribution records.
-4. Generated guidance receives only authorized source IDs and is persisted with its input hash and warnings before being returned.
-5. Portfolio sharing resolves a hashed token through the server and returns visible sections only.
-6. Private evidence files are accessed through short-lived signed operations after both server authorization and Storage RLS.
+1. Supabase Auth creates a profile via a restricted trigger; a migration creates compatible server-managed role grants.
+2. Student source data is saved through validated forms and RLS.
+3. Tasks, evidence, reflections, skills, reviews, confirmations, application-prep materials, relationship invitations, and portfolio settings are separate records with their own access rules.
+4. Generation starts from an authorized source allowlist, validates schema and ethical rules, records provenance, then returns editable text.
+5. Portfolio sharing resolves only a hashed, unexpired, unrevoked token and returns selected sections/evidence.
+6. Private evidence files use short-lived signed operations after server authorization and Storage policy checks.
+7. Checkout creates a payment session on the server; a trusted provider callback/webhook activates a subscription idempotently.
 
-## Project lifecycle
+## Commercial model
 
-`draft → awaiting_counselor_review → revision_requested | approved → active → paused | completed → archived`
+Plan metadata sits in `plans.entitlements`; server routes enforce limits. Active subscriptions, complimentary grants, manual grants, and platform-owner access can grant entitlements. A discount grant is intentionally different: it adjusts an eligible checkout price but cannot create access on its own.
 
-Only defined transitions are accepted by the domain helper. Completed claims require evidence; task submission does not equal counselor approval.
-
-## Entitlements
-
-Plan metadata is stored in `plans.entitlements`. Server routes enforce idea, project, workspace, and counselor-assignment limits; UI state is explanatory, not authoritative.
+Schools use organizations, memberships, cohorts, and quote-led annual contracts. Parents and mentors are access participants, not individually sold plans.
 
 ## Operational model
 
-Vercel hosts Next.js. Hosted Supabase provides Auth/Postgres/Storage. PDF rendering and deterministic generation run in server routes. Production adds error monitoring, transactional email, backups, malware scanning, and rate limiting at the deployment edge/database boundary.
+Vercel hosts Next.js. Hosted Supabase provides Auth, PostgreSQL, private Storage, and RLS. Deterministic generation, PDF creation, share-token resolution, and payment operations run on the server. Production should add managed error monitoring, transactional email, asynchronous malware scanning, backups, distributed rate limiting, and feature flags.

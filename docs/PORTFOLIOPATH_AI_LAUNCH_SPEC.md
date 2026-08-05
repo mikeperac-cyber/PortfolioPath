@@ -60,10 +60,12 @@ type PortfolioGenerationType =
   | "reflection_support"
   | "portfolio_text"
   | "presentation"
-  | "recommendation_evidence"
+  | "recommendation_evidence";
 
 interface GenerationProvider {
-  generate<T>(request: AuthorizedGenerationRequest): Promise<GenerationEnvelope<T>>
+  generate<T>(
+    request: AuthorizedGenerationRequest,
+  ): Promise<GenerationEnvelope<T>>;
 }
 ```
 
@@ -174,16 +176,16 @@ The output must use neutral evidence-summary language. It must not use first-per
 
 ## 4. Error handling
 
-| Code | HTTP | Condition | User-safe response | Retry |
-|---|---:|---|---|---|
-| `VALIDATION_ERROR` | 400 | Request shape or field limit invalid | Identify the fields requiring correction. | After correction |
-| `AUTHENTICATION_REQUIRED` | 401 | No valid session | Ask the user to sign in. | After sign-in |
-| `SOURCE_NOT_AUTHORIZED` | 403 | Source is not owned by or assigned to the requester | Do not disclose whether the record exists. | No |
-| `INSUFFICIENT_VERIFIED_DATA` | 422 | Eligible sources cannot support the requested section | List missing evidence categories without inventing content. | After records change |
-| `UNSUPPORTED_CLAIM` | 422 | Output includes an unsupported fact or prohibited superlative | Return the flagged wording and request qualification. | After revision |
-| `RATE_LIMITED` | 429 | Generation allowance exceeded | Return `Retry-After`; preserve existing drafts. | Later |
-| `PROVIDER_TIMEOUT` | internal | Live provider exceeds timeout | Use deterministic fallback; expose a non-alarming fallback label. | Automatic |
-| `GENERATION_UNAVAILABLE` | 503 | Live and deterministic providers fail | Return no draft and keep source data unchanged. | Later |
+| Code                         |     HTTP | Condition                                                     | User-safe response                                                | Retry                |
+| ---------------------------- | -------: | ------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------- |
+| `VALIDATION_ERROR`           |      400 | Request shape or field limit invalid                          | Identify the fields requiring correction.                         | After correction     |
+| `AUTHENTICATION_REQUIRED`    |      401 | No valid session                                              | Ask the user to sign in.                                          | After sign-in        |
+| `SOURCE_NOT_AUTHORIZED`      |      403 | Source is not owned by or assigned to the requester           | Do not disclose whether the record exists.                        | No                   |
+| `INSUFFICIENT_VERIFIED_DATA` |      422 | Eligible sources cannot support the requested section         | List missing evidence categories without inventing content.       | After records change |
+| `UNSUPPORTED_CLAIM`          |      422 | Output includes an unsupported fact or prohibited superlative | Return the flagged wording and request qualification.             | After revision       |
+| `RATE_LIMITED`               |      429 | Generation allowance exceeded                                 | Return `Retry-After`; preserve existing drafts.                   | Later                |
+| `PROVIDER_TIMEOUT`           | internal | Live provider exceeds timeout                                 | Use deterministic fallback; expose a non-alarming fallback label. | Automatic            |
+| `GENERATION_UNAVAILABLE`     |      503 | Live and deterministic providers fail                         | Return no draft and keep source data unchanged.                   | Later                |
 
 Logs must exclude full reflections, evidence contents, counselor comments, prompts containing student data, and model responses. Operational logs use correlation IDs, error codes, provider timing, schema version, and redacted counts.
 
@@ -321,6 +323,8 @@ CTA: **Read Our Ethical Use Policy**
   Full workspace, evidence, reflections, skills, counselor review, portfolio, presentation, and PDF.
 - **Counselor Professional — ₺2,500/month**  
   Assigned students, reviews, comments, skill confirmations, progress reports, and templates.
+- **School Partnership — annual quote**
+  Organization seats, cohorts, school counselor tools, templates, completion insights, and guided onboarding. Schools request a quote; there is no self-service school checkout.
 
 CTA: **Compare Plans**
 
@@ -515,12 +519,13 @@ Bağlantılar: Nasıl çalışır · Öğrenciler · Danışmanlar · Fiyatland�
 
 Start with a realistic direction. Upgrade when you are ready to plan, document, review, and present the complete project. PortfolioPath does not sell admission outcomes.
 
-| Plan | Price | Best for | Includes | CTA |
-|---|---:|---|---|---|
-| Free Project Readiness Assessment | ₺0 | Students deciding where to begin | Profile assessment, one limited project direction, readiness summary | Start Free Assessment |
-| Project Blueprint | ₺1,200 once | Students ready to plan one project | Three tailored ideas, one full blueprint, weekly plan, evidence checklist, reflection prompts, downloadable plan | Build My Blueprint |
-| Complete Student Portfolio | ₺5,500 once | Students completing and presenting up to three projects | Workspace, weekly planner, evidence vault, reflections, skills, counselor review, portfolio page, presentation, PDF | Build My Portfolio |
-| Counselor Professional | ₺2,500/month | Independent counselors and small consultancies | Up to 25 assigned students, proposal/evidence/reflection reviews, comments, skill confirmations, progress reports, templates | Request Counselor Access |
+| Plan                              |        Price | Best for                                                | Includes                                                                                                                     | CTA                      |
+| --------------------------------- | -----------: | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| Free Project Readiness Assessment |           ₺0 | Students deciding where to begin                        | Profile assessment, one limited project direction, readiness summary                                                         | Start Free Assessment    |
+| Project Blueprint                 |  ₺1,200 once | Students ready to plan one project                      | Three tailored ideas, one full blueprint, weekly plan, evidence checklist, reflection prompts, downloadable plan             | Build My Blueprint       |
+| Complete Student Portfolio        |  ₺5,500 once | Students completing and presenting up to three projects | Workspace, weekly planner, evidence vault, reflections, skills, counselor review, portfolio page, presentation, PDF          | Build My Portfolio       |
+| Counselor Professional            | ₺2,500/month | Independent counselors and small consultancies          | Up to 25 assigned students, proposal/evidence/reflection reviews, comments, skill confirmations, progress reports, templates | Request Counselor Access |
+| School Partnership                | Annual quote | Schools and education organizations                     | Organization seats, cohorts, counselor tools, templates, completion insights, guided onboarding                              | Request a School Quote   |
 
 **Pricing note:** Payments purchase workflow access and guidance. They do not purchase achievements, counselor approval, university admission, or scholarships.
 
@@ -530,12 +535,13 @@ Start with a realistic direction. Upgrade when you are ready to plan, document, 
 
 Gerçekçi bir yönle başla. Projeni planlamaya, belgelemeye, inceletmeye ve sunmaya hazır olduğunda planını yükselt. PortfolioPath kabul sonucu satmaz.
 
-| Plan | Fiyat | Kimler için? | İçerik | CTA |
-|---|---:|---|---|---|
-| Ücretsiz Proje Hazırlık Değerlendirmesi | ₺0 | Nereden başlayacağına karar veren öğrenciler | Profil değerlendirmesi, bir sınırlı proje yönü, hazırlık özeti | Ücretsiz Değerlendirmeyi Başlat |
-| Proje Yol Haritası | tek seferlik ₺1.200 | Bir projeyi planlamaya hazır öğrenciler | Üç kişiselleştirilmiş fikir, bir tam plan, haftalık yol haritası, kanıt listesi, öz değerlendirme soruları, indirilebilir plan | Yol Haritamı Oluştur |
-| Tam Öğrenci Portföyü | tek seferlik ₺5.500 | En fazla üç projeyi tamamlayıp sunmak isteyen öğrenciler | Proje alanı, haftalık plan, kanıt kasası, öz değerlendirmeler, beceriler, danışman incelemesi, portföy, sunum, PDF | Portföyümü Oluştur |
-| Profesyonel Danışman | aylık ₺2.500 | Bağımsız danışmanlar ve küçük danışmanlık ofisleri | En fazla 25 atanmış öğrenci, proje/kanıt/öz değerlendirme incelemeleri, yorumlar, beceri onayları, ilerleme raporları, şablonlar | Danışman Erişimi İste |
+| Plan                                    |               Fiyat | Kimler için?                                             | İçerik                                                                                                                           | CTA                             |
+| --------------------------------------- | ------------------: | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| Ücretsiz Proje Hazırlık Değerlendirmesi |                  ₺0 | Nereden başlayacağına karar veren öğrenciler             | Profil değerlendirmesi, bir sınırlı proje yönü, hazırlık özeti                                                                   | Ücretsiz Değerlendirmeyi Başlat |
+| Proje Yol Haritası                      | tek seferlik ₺1.200 | Bir projeyi planlamaya hazır öğrenciler                  | Üç kişiselleştirilmiş fikir, bir tam plan, haftalık yol haritası, kanıt listesi, öz değerlendirme soruları, indirilebilir plan   | Yol Haritamı Oluştur            |
+| Tam Öğrenci Portföyü                    | tek seferlik ₺5.500 | En fazla üç projeyi tamamlayıp sunmak isteyen öğrenciler | Proje alanı, haftalık plan, kanıt kasası, öz değerlendirmeler, beceriler, danışman incelemesi, portföy, sunum, PDF               | Portföyümü Oluştur              |
+| Profesyonel Danışman                    |        aylık ₺2.500 | Bağımsız danışmanlar ve küçük danışmanlık ofisleri       | En fazla 25 atanmış öğrenci, proje/kanıt/öz değerlendirme incelemeleri, yorumlar, beceri onayları, ilerleme raporları, şablonlar | Danışman Erişimi İste           |
+| Okul Ortaklığı                          |       yıllık teklif | Okullar ve eğitim kurumları                              | Kurum koltukları, kohortlar, danışman araçları, şablonlar, tamamlama içgörüleri, rehberli başlangıç                              | Okul Teklifi İste               |
 
 **Fiyatlandırma notu:** Ödemeler iş akışına ve rehberliğe erişim sağlar. Başarı, danışman onayı, üniversite kabulü veya burs satın almaz.
 
@@ -565,40 +571,40 @@ CTA: **Kurucu Danışman Pilotunu Görüş**
 
 ## 9. Thirty-day launch plan
 
-| Period | Outcome | Actions | Owner | Deliverables | Exit criteria |
-|---|---|---|---|---|---|
-| Days 1–3 | Offer locked | Confirm audience, plan boundaries, qualification questions, private pilot quoting process, and no-guarantee language. | Founder + product | Offer sheet, qualification form, pricing guardrails | All public and sales copy uses the same inclusions and prices. |
-| Days 4–7 | Acquisition foundation ready | Finalize landing/pricing copy, marine sample project, sample portfolio, readiness assessment, source consent, and analytics dictionary. | Product + content + counselor | Publish-ready copy, assessment, two samples, consent template | Five people unfamiliar with the product can explain the offer after viewing the page. |
-| Days 8–10 | Founding pipeline created | Invite qualified students from existing networks; contact independent counselors; schedule short diagnostics. | Founder/growth | Candidate list, outreach log, discovery guide | At least 10 student conversations and 5 counselor conversations scheduled or completed. |
-| Days 11–14 | Manual service tested | Select five students and two counselors; manually deliver ideas/blueprints; record time, edits, questions, and failure points. | Counselor + product | Five blueprints, workflow observation log | Every repeated manual step is classified as retain, automate, simplify, or remove. |
-| Days 15–18 | Students active in MVP | Onboard pilot users, create projects, complete first tasks, and upload first evidence. | Product + counselor | Activated accounts and first-week records | At least 4/5 students create a project and 3/5 upload evidence. |
-| Days 19–21 | Core workflow improved | Conduct usability interviews; prioritize wizard and evidence friction; document ethical cases with explicit consent and anonymization. | Product + engineering + counselor | Findings brief, prioritized fixes, consented case material | No critical blocker remains in project creation or first evidence upload. |
-| Days 22–24 | Proof material ready | Publish the diving transformation with plans clearly separated from completed facts; prepare parent webinar. | Content + counselor | Case page, webinar deck/run-of-show, FAQ | Counselor verifies every public claim and source reference. |
-| Days 25–27 | Counselor motion launched | Send tailored counselor outreach, run demos, and qualify fit for the founding pilot. | Founder/sales | Outreach batch, demo script, follow-up queue | Two qualified counselor pilot discussions reach a documented next step. |
-| Days 28–30 | Repeatable acquisition begins | Run the parent webinar, ask for referrals, launch small paid tests, and review the complete funnel. | Founder + growth | Webinar recording/summary, referral script, experiment report | Decide which one student channel and one counselor channel receive the next 30-day investment. |
+| Period     | Outcome                       | Actions                                                                                                                                 | Owner                             | Deliverables                                                  | Exit criteria                                                                                  |
+| ---------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Days 1–3   | Offer locked                  | Confirm audience, plan boundaries, qualification questions, private pilot quoting process, and no-guarantee language.                   | Founder + product                 | Offer sheet, qualification form, pricing guardrails           | All public and sales copy uses the same inclusions and prices.                                 |
+| Days 4–7   | Acquisition foundation ready  | Finalize landing/pricing copy, marine sample project, sample portfolio, readiness assessment, source consent, and analytics dictionary. | Product + content + counselor     | Publish-ready copy, assessment, two samples, consent template | Five people unfamiliar with the product can explain the offer after viewing the page.          |
+| Days 8–10  | Founding pipeline created     | Invite qualified students from existing networks; contact independent counselors; schedule short diagnostics.                           | Founder/growth                    | Candidate list, outreach log, discovery guide                 | At least 10 student conversations and 5 counselor conversations scheduled or completed.        |
+| Days 11–14 | Manual service tested         | Select five students and two counselors; manually deliver ideas/blueprints; record time, edits, questions, and failure points.          | Counselor + product               | Five blueprints, workflow observation log                     | Every repeated manual step is classified as retain, automate, simplify, or remove.             |
+| Days 15–18 | Students active in MVP        | Onboard pilot users, create projects, complete first tasks, and upload first evidence.                                                  | Product + counselor               | Activated accounts and first-week records                     | At least 4/5 students create a project and 3/5 upload evidence.                                |
+| Days 19–21 | Core workflow improved        | Conduct usability interviews; prioritize wizard and evidence friction; document ethical cases with explicit consent and anonymization.  | Product + engineering + counselor | Findings brief, prioritized fixes, consented case material    | No critical blocker remains in project creation or first evidence upload.                      |
+| Days 22–24 | Proof material ready          | Publish the diving transformation with plans clearly separated from completed facts; prepare parent webinar.                            | Content + counselor               | Case page, webinar deck/run-of-show, FAQ                      | Counselor verifies every public claim and source reference.                                    |
+| Days 25–27 | Counselor motion launched     | Send tailored counselor outreach, run demos, and qualify fit for the founding pilot.                                                    | Founder/sales                     | Outreach batch, demo script, follow-up queue                  | Two qualified counselor pilot discussions reach a documented next step.                        |
+| Days 28–30 | Repeatable acquisition begins | Run the parent webinar, ask for referrals, launch small paid tests, and review the complete funnel.                                     | Founder + growth                  | Webinar recording/summary, referral script, experiment report | Decide which one student channel and one counselor channel receive the next 30-day investment. |
 
-The parent webinar is an acquisition and education event. It does not introduce parent accounts or parent product access.
+The parent webinar is an acquisition and education event. It may introduce the consent-based Parent View: milestones, selected evidence, and permitted updates only; private reflections remain private by default.
 
 ## 10. Privacy-safe measurement
 
 ### 10.1 Event dictionary
 
-| Event | Trigger | Numerator | Denominator | Window | Allowed segments | Owner |
-|---|---|---|---|---|---|---|
-| `readiness_assessment_completed` | Final assessment step stored | Completed assessments | Assessment starts | Same session / 7 days | Locale, acquisition source, device class | Growth |
-| `registration_completed` | Active student/counselor user created | Registrations | Completed assessments or registration starts | 7 days | Role, locale, acquisition source | Growth |
-| `project_idea_selected` | Student selects one returned suggestion | Students selecting an idea | Students receiving ideas | 7 days | Plan, category, major group | Product |
-| `project_creation_completed` | Required project fields stored | Students creating a project | Onboarded students | 7 days | Plan, category, application year | Product |
-| `first_task_completed` | First task becomes complete | Projects with a completed task | Created projects | 7 days from creation | Plan, category | Product |
-| `first_evidence_uploaded` | First evidence metadata record created | Projects with evidence | Created projects | 7 days from creation | Plan, evidence type | Product |
-| `first_reflection_completed` | First reflection submitted | Projects with reflection | Created projects | 7 days from creation | Plan, reflection type | Product |
-| `counselor_response_recorded` | Review/comment is stored | Reviews within SLA | Items submitted for review | 5 business days | Counselor, review type | Counselor operations |
-| `portfolio_completed` | Portfolio marked ready after confirmation | Ready portfolios | Active projects | Project lifetime | Plan, category | Product |
-| `payment_completed` | Verified idempotent payment succeeds | Paid accounts or recognized TRY | Checkout starts | 7 days | Plan, provider, acquisition source | Founder/finance |
-| `student_retained_weekly` | Student performs a core action in a later week | Returning active students | Activated students | Week 2/4/8 | Plan, cohort | Product |
-| `counselor_retained_monthly` | Counselor reviews or comments in a later month | Returning counselors | Activated counselors | Month 2/3 | Plan, cohort | Founder |
-| `support_request_created` | Support case receives an ID | Cases by category | Active users | Weekly | Role, category, severity | Support |
-| `project_abandoned` | Active project has no core activity for 21 days and is not completed/archived | Inactive projects | Started projects | Rolling 21 days | Plan, stage, category | Product |
+| Event                            | Trigger                                                                       | Numerator                       | Denominator                                  | Window                | Allowed segments                         | Owner                |
+| -------------------------------- | ----------------------------------------------------------------------------- | ------------------------------- | -------------------------------------------- | --------------------- | ---------------------------------------- | -------------------- |
+| `readiness_assessment_completed` | Final assessment step stored                                                  | Completed assessments           | Assessment starts                            | Same session / 7 days | Locale, acquisition source, device class | Growth               |
+| `registration_completed`         | Active student/counselor user created                                         | Registrations                   | Completed assessments or registration starts | 7 days                | Role, locale, acquisition source         | Growth               |
+| `project_idea_selected`          | Student selects one returned suggestion                                       | Students selecting an idea      | Students receiving ideas                     | 7 days                | Plan, category, major group              | Product              |
+| `project_creation_completed`     | Required project fields stored                                                | Students creating a project     | Onboarded students                           | 7 days                | Plan, category, application year         | Product              |
+| `first_task_completed`           | First task becomes complete                                                   | Projects with a completed task  | Created projects                             | 7 days from creation  | Plan, category                           | Product              |
+| `first_evidence_uploaded`        | First evidence metadata record created                                        | Projects with evidence          | Created projects                             | 7 days from creation  | Plan, evidence type                      | Product              |
+| `first_reflection_completed`     | First reflection submitted                                                    | Projects with reflection        | Created projects                             | 7 days from creation  | Plan, reflection type                    | Product              |
+| `counselor_response_recorded`    | Review/comment is stored                                                      | Reviews within SLA              | Items submitted for review                   | 5 business days       | Counselor, review type                   | Counselor operations |
+| `portfolio_completed`            | Portfolio marked ready after confirmation                                     | Ready portfolios                | Active projects                              | Project lifetime      | Plan, category                           | Product              |
+| `payment_completed`              | Verified idempotent payment succeeds                                          | Paid accounts or recognized TRY | Checkout starts                              | 7 days                | Plan, provider, acquisition source       | Founder/finance      |
+| `student_retained_weekly`        | Student performs a core action in a later week                                | Returning active students       | Activated students                           | Week 2/4/8            | Plan, cohort                             | Product              |
+| `counselor_retained_monthly`     | Counselor reviews or comments in a later month                                | Returning counselors            | Activated counselors                         | Month 2/3             | Plan, cohort                             | Founder              |
+| `support_request_created`        | Support case receives an ID                                                   | Cases by category               | Active users                                 | Weekly                | Role, category, severity                 | Support              |
+| `project_abandoned`              | Active project has no core activity for 21 days and is not completed/archived | Inactive projects               | Started projects                             | Rolling 21 days       | Plan, stage, category                    | Product              |
 
 Core actions are task completion, evidence upload, reflection submission, review submission, or portfolio edit. Page views and login alone do not count as project engagement.
 
@@ -722,7 +728,7 @@ All scripts are editable drafts. Personalize truthfully and do not claim custome
 ### Copy and launch
 
 - English and Turkish sections have equivalent claims, prices, CTAs, and ethical qualifications.
-- Pricing contains no school plan and uses ₺0, ₺1,200, ₺5,500, and ₺2,500/month consistently.
+- Pricing uses ₺0, ₺1,200, ₺5,500, ₺2,500/month, and a quote-led annual School Partnership consistently. It never presents school access as a self-service checkout product.
 - Founding pricing is private; there are no countdowns, fake seat numbers, crossed-out fictional prices, or manufactured testimonials.
 - No copy guarantees admission, scholarships, counselor confirmation, or project impact.
 - Mobile review checks Turkish text wrapping, CTA length, heading hierarchy, keyboard focus, and contrast within the existing navy/gold system.

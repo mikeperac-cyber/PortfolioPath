@@ -1,4 +1,17 @@
 import { NextResponse } from "next/server"
 import { getPaymentProvider } from "@/lib/payments"
-import { createAdminClient } from "@/lib/supabase/admin"
-export async function POST(request:Request){try{const payload=await request.text();const signature=request.headers.get("stripe-signature");const event=await getPaymentProvider().verifyWebhook(payload,signature);const admin=createAdminClient();const {data:existing}=await admin.from("payments").select("id").eq("provider_payment_id",event.id).maybeSingle();if(existing)return NextResponse.json({received:true,idempotent:true});const object=event.data as Record<string,unknown>|undefined;const metadata=(object?.metadata??{}) as Record<string,string>;const userId=metadata.userId;const planCode=metadata.planCode;if(!userId||!planCode)return NextResponse.json({received:true,ignored:true});const {data:plan}=await admin.from("plans").select("id,price_try").eq("code",planCode).single();if(!plan)return NextResponse.json({error:"Unknown plan."},{status:400});await admin.from("payments").insert({user_id:userId,plan_id:plan.id,provider:process.env.PAYMENT_PROVIDER??"test",provider_payment_id:event.id,amount_try:plan.price_try,status:event.type.includes("completed")||event.type.includes("succeeded")?"paid":"received",payload:object??{}});if(event.type.includes("completed")||event.type.includes("succeeded"))await admin.from("subscriptions").upsert({user_id:userId,plan_id:plan.id,provider:process.env.PAYMENT_PROVIDER??"test",provider_customer_id:String(object?.customer??"")||null,provider_subscription_id:String(object?.subscription??"")||null,status:"active",updated_at:new Date().toISOString()},{onConflict:"user_id,plan_id"});return NextResponse.json({received:true})}catch(error){return NextResponse.json({error:error instanceof Error?error.message:"Webhook rejected."},{status:400})}}
+import { fulfillPaymentSession, findPaymentSession } from "@/lib/payments/fulfillment"
+
+export async function POST(request: Request) {
+  try {
+    const event = await getPaymentProvider().verifyWebhook(await request.text(), request.headers)
+    const metadata = event.data.metadata as Record<string, unknown> | undefined
+    const paymentSessionId = typeof metadata?.paymentSessionId === "string" ? metadata.paymentSessionId : undefined
+    const session = await findPaymentSession({ id: paymentSessionId, conversationId: event.conversationId ?? undefined, providerSubscriptionId: event.providerSubscriptionId ?? undefined })
+    if (!session) return NextResponse.json({ received: true, ignored: true })
+    const result = await fulfillPaymentSession(session, event)
+    return NextResponse.json({ received: true, paid: result.paid, idempotent: result.idempotent })
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Webhook rejected." }, { status: 400 })
+  }
+}
