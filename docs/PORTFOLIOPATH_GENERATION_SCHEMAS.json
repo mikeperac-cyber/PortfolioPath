@@ -1,0 +1,985 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portfoliopath.example/schemas/generation-v1.json",
+  "title": "PortfolioPath Generation Response Schemas",
+  "description": "Provider-neutral, provenance-preserving response contracts for guarded PortfolioPath generation.",
+  "oneOf": [
+    { "$ref": "#/$defs/projectIdeasEnvelope" },
+    { "$ref": "#/$defs/projectBlueprintEnvelope" },
+    { "$ref": "#/$defs/reflectionSupportEnvelope" },
+    { "$ref": "#/$defs/portfolioTextEnvelope" },
+    { "$ref": "#/$defs/presentationEnvelope" },
+    { "$ref": "#/$defs/recommendationEvidenceEnvelope" }
+  ],
+  "$defs": {
+    "nonEmptyText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "shortText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sourceStatus": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "student_reported",
+        "completed",
+        "accepted",
+        "evidence_supported",
+        "counselor_confirmed",
+        "approved"
+      ]
+    },
+    "sourceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "student_profile",
+            "project_idea",
+            "project",
+            "task",
+            "evidence",
+            "reflection",
+            "project_outcome",
+            "project_skill",
+            "skill_confirmation",
+            "counselor_comment",
+            "portfolio_section"
+          ]
+        },
+        "status": { "$ref": "#/$defs/sourceStatus" }
+      }
+    },
+    "unsupportedClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "reason", "action"],
+      "properties": {
+        "text": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "missing_source",
+            "unverified_impact",
+            "unsupported_superlative",
+            "invented_observation",
+            "invented_role",
+            "invented_participant_or_partner",
+            "plan_described_as_complete",
+            "prohibited_admissions_claim"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "enum": ["omitted", "qualified", "needs_student_revision", "needs_counselor_review"]
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRecords",
+        "guidanceLabel",
+        "warnings",
+        "unsupportedClaims",
+        "fallbackUsed",
+        "requiresFactualConfirmation"
+      ],
+      "properties": {
+        "sourceRecords": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceRecord" },
+          "uniqueItems": true,
+          "maxItems": 200
+        },
+        "guidanceLabel": {
+          "type": "string",
+          "const": "Editable guidance generated from authorized PortfolioPath records."
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "uniqueItems": true,
+          "maxItems": 30
+        },
+        "unsupportedClaims": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/unsupportedClaim" },
+          "maxItems": 30
+        },
+        "fallbackUsed": { "type": "boolean" },
+        "requiresFactualConfirmation": { "const": true }
+      }
+    },
+    "baseEnvelope": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "generationId",
+        "generationType",
+        "locale",
+        "data",
+        "provenance"
+      ],
+      "properties": {
+        "schemaVersion": { "type": "string", "const": "1.0.0" },
+        "generationId": { "$ref": "#/$defs/uuid" },
+        "generationType": {
+          "type": "string",
+          "enum": [
+            "project_ideas",
+            "project_blueprint",
+            "reflection_support",
+            "portfolio_text",
+            "presentation",
+            "recommendation_evidence"
+          ]
+        },
+        "locale": { "type": "string", "enum": ["en", "tr"] },
+        "data": true,
+        "provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+    "qualitativeAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authenticity",
+        "feasibility",
+        "studentOwnership",
+        "evidencePotential",
+        "completionLikelihood",
+        "rationale"
+      ],
+      "properties": {
+        "authenticity": { "type": "string", "enum": ["strong", "adequate", "limited"] },
+        "feasibility": { "type": "string", "enum": ["strong", "adequate", "limited"] },
+        "studentOwnership": { "type": "string", "enum": ["strong", "adequate", "limited"] },
+        "evidencePotential": { "type": "string", "enum": ["strong", "adequate", "limited"] },
+        "completionLikelihood": { "type": "string", "enum": ["strong", "adequate", "limited"] },
+        "rationale": { "type": "string", "minLength": 1, "maxLength": 700 }
+      }
+    },
+    "milestone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "title", "plannedResult"],
+      "properties": {
+        "sequence": { "type": "integer", "minimum": 1, "maximum": 52 },
+        "title": { "$ref": "#/$defs/shortText" },
+        "plannedResult": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "evidenceChecklistItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "evidenceType", "collectionTiming", "purpose"],
+      "properties": {
+        "title": { "$ref": "#/$defs/shortText" },
+        "evidenceType": { "$ref": "#/$defs/shortText" },
+        "collectionTiming": { "$ref": "#/$defs/shortText" },
+        "purpose": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "projectIdea": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "category",
+        "concept",
+        "fit",
+        "intendedMajorConnection",
+        "personalMotivationAngle",
+        "objective",
+        "targetAudience",
+        "finalDeliverable",
+        "durationWeeks",
+        "weeklyHours",
+        "estimatedCostTry",
+        "majorMilestones",
+        "evidenceChecklist",
+        "measurableOutcomeIdeas",
+        "targetSkills",
+        "likelyChallenges",
+        "ethicalConsiderations",
+        "firstAction",
+        "coverage",
+        "assessment",
+        "suggestionOnly"
+      ],
+      "properties": {
+        "title": { "$ref": "#/$defs/shortText" },
+        "category": { "$ref": "#/$defs/shortText" },
+        "concept": { "$ref": "#/$defs/nonEmptyText" },
+        "fit": { "$ref": "#/$defs/nonEmptyText" },
+        "intendedMajorConnection": { "$ref": "#/$defs/nonEmptyText" },
+        "personalMotivationAngle": { "$ref": "#/$defs/nonEmptyText" },
+        "objective": { "$ref": "#/$defs/nonEmptyText" },
+        "targetAudience": { "$ref": "#/$defs/shortText" },
+        "finalDeliverable": { "$ref": "#/$defs/shortText" },
+        "durationWeeks": { "type": "integer", "minimum": 2, "maximum": 24 },
+        "weeklyHours": { "type": "number", "minimum": 1, "maximum": 30 },
+        "estimatedCostTry": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "majorMilestones": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/milestone" },
+          "minItems": 3,
+          "maxItems": 12
+        },
+        "evidenceChecklist": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceChecklistItem" },
+          "minItems": 3,
+          "maxItems": 20
+        },
+        "measurableOutcomeIdeas": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 3,
+          "maxItems": 5
+        },
+        "targetSkills": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/shortText" },
+          "minItems": 2,
+          "maxItems": 8,
+          "uniqueItems": true
+        },
+        "likelyChallenges": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "ethicalConsiderations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "firstAction": { "$ref": "#/$defs/nonEmptyText" },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "usesExistingExperience",
+            "lowBudget",
+            "tangibleOutput",
+            "longitudinalEvidence",
+            "intendedMajorConnection"
+          ],
+          "properties": {
+            "usesExistingExperience": { "type": "boolean" },
+            "lowBudget": { "type": "boolean" },
+            "tangibleOutput": { "type": "boolean" },
+            "longitudinalEvidence": { "type": "boolean" },
+            "intendedMajorConnection": { "type": "boolean" }
+          }
+        },
+        "assessment": { "$ref": "#/$defs/qualitativeAssessment" },
+        "suggestionOnly": { "const": true }
+      }
+    },
+    "projectIdeasData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ideas", "setCoverage", "orderingNote"],
+      "properties": {
+        "ideas": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/projectIdea" },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "setCoverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hasExistingExperienceIdea",
+            "hasLowBudgetIdea",
+            "hasTangibleOutputIdea",
+            "hasLongitudinalEvidenceIdea",
+            "hasIntendedMajorIdea"
+          ],
+          "properties": {
+            "hasExistingExperienceIdea": { "const": true },
+            "hasLowBudgetIdea": { "const": true },
+            "hasTangibleOutputIdea": { "const": true },
+            "hasLongitudinalEvidenceIdea": { "const": true },
+            "hasIntendedMajorIdea": { "const": true }
+          }
+        },
+        "orderingNote": {
+          "type": "string",
+          "const": "Ordered only by authenticity, feasibility, student ownership, evidence potential, and completion likelihood—not admissions value."
+        }
+      }
+    },
+    "projectIdeasEnvelope": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "generationType": { "const": "project_ideas" },
+            "data": { "$ref": "#/$defs/projectIdeasData" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "planned"],
+      "properties": {
+        "description": { "$ref": "#/$defs/nonEmptyText" },
+        "planned": { "const": true }
+      }
+    },
+    "plannedOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "successIndicator", "planned"],
+      "properties": {
+        "description": { "$ref": "#/$defs/nonEmptyText" },
+        "successIndicator": { "$ref": "#/$defs/nonEmptyText" },
+        "planned": { "const": true }
+      }
+    },
+    "blueprintTask": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "estimatedMinutes"],
+      "properties": {
+        "title": { "$ref": "#/$defs/shortText" },
+        "description": { "$ref": "#/$defs/nonEmptyText" },
+        "estimatedMinutes": { "type": "integer", "minimum": 5, "maximum": 1800 }
+      }
+    },
+    "blueprintWeek": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "weekNumber",
+        "milestone",
+        "tasks",
+        "estimatedMinutes",
+        "evidenceRequired",
+        "reflectionPrompt",
+        "possibleObstacle",
+        "alternativeAction"
+      ],
+      "properties": {
+        "weekNumber": { "type": "integer", "minimum": 1, "maximum": 24 },
+        "milestone": { "$ref": "#/$defs/nonEmptyText" },
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/blueprintTask" },
+          "minItems": 1,
+          "maxItems": 12
+        },
+        "estimatedMinutes": { "type": "integer", "minimum": 15, "maximum": 3600 },
+        "evidenceRequired": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 1,
+          "maxItems": 12
+        },
+        "reflectionPrompt": { "$ref": "#/$defs/nonEmptyText" },
+        "possibleObstacle": { "$ref": "#/$defs/nonEmptyText" },
+        "alternativeAction": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["risk", "earlySignal", "mitigation", "alternativePlan"],
+      "properties": {
+        "risk": { "$ref": "#/$defs/nonEmptyText" },
+        "earlySignal": { "$ref": "#/$defs/nonEmptyText" },
+        "mitigation": { "$ref": "#/$defs/nonEmptyText" },
+        "alternativePlan": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "projectBlueprintData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projectSummary",
+        "personalMotivation",
+        "mainObjective",
+        "secondaryObjectives",
+        "measurableOutcomes",
+        "successCriteria",
+        "scopeIncluded",
+        "scopeExcluded",
+        "weeklyRoadmap",
+        "taskList",
+        "evidencePlan",
+        "reflectionPrompts",
+        "skillsPlan",
+        "riskRegister",
+        "finalDeliverablePlan",
+        "presentationOutline",
+        "recommendationEvidenceChecklist",
+        "firstSevenActions",
+        "planningLabel"
+      ],
+      "properties": {
+        "projectSummary": { "$ref": "#/$defs/nonEmptyText" },
+        "personalMotivation": { "$ref": "#/$defs/nonEmptyText" },
+        "mainObjective": { "$ref": "#/$defs/objective" },
+        "secondaryObjectives": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/objective" },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "measurableOutcomes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/plannedOutcome" },
+          "minItems": 3,
+          "maxItems": 5
+        },
+        "successCriteria": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 3,
+          "maxItems": 10
+        },
+        "scopeIncluded": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 1,
+          "maxItems": 15
+        },
+        "scopeExcluded": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 1,
+          "maxItems": 15
+        },
+        "weeklyRoadmap": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/blueprintWeek" },
+          "minItems": 2,
+          "maxItems": 24
+        },
+        "taskList": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/blueprintTask" },
+          "minItems": 3,
+          "maxItems": 100
+        },
+        "evidencePlan": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceChecklistItem" },
+          "minItems": 3,
+          "maxItems": 30
+        },
+        "reflectionPrompts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 3,
+          "maxItems": 30
+        },
+        "skillsPlan": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["skill", "plannedPractice", "expectedEvidence"],
+            "properties": {
+              "skill": { "$ref": "#/$defs/shortText" },
+              "plannedPractice": { "$ref": "#/$defs/nonEmptyText" },
+              "expectedEvidence": { "$ref": "#/$defs/nonEmptyText" }
+            }
+          },
+          "minItems": 2,
+          "maxItems": 10
+        },
+        "riskRegister": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/risk" },
+          "minItems": 2,
+          "maxItems": 15
+        },
+        "finalDeliverablePlan": { "$ref": "#/$defs/nonEmptyText" },
+        "presentationOutline": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 3,
+          "maxItems": 12
+        },
+        "recommendationEvidenceChecklist": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 3,
+          "maxItems": 20
+        },
+        "firstSevenActions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 7,
+          "maxItems": 7
+        },
+        "planningLabel": {
+          "type": "string",
+          "const": "This blueprint describes planned work, not completed achievements."
+        }
+      }
+    },
+    "projectBlueprintEnvelope": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "generationType": { "const": "project_blueprint" },
+            "data": { "$ref": "#/$defs/projectBlueprintData" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "vaguePhrase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phrase", "reason", "followUpQuestion"],
+      "properties": {
+        "phrase": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "reason": { "$ref": "#/$defs/nonEmptyText" },
+        "followUpQuestion": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "reflectionSupportData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "followUpQuestions",
+        "vaguePhrases",
+        "concreteExampleRequests",
+        "actionLearningDistinctions",
+        "structureSuggestions",
+        "evidenceQuestions",
+        "ownershipReminder",
+        "replacementReflection"
+      ],
+      "properties": {
+        "followUpQuestions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 1,
+          "maxItems": 10
+        },
+        "vaguePhrases": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/vaguePhrase" },
+          "maxItems": 10
+        },
+        "concreteExampleRequests": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "maxItems": 10
+        },
+        "actionLearningDistinctions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "maxItems": 10
+        },
+        "structureSuggestions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "maxItems": 8
+        },
+        "evidenceQuestions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "maxItems": 10
+        },
+        "ownershipReminder": {
+          "type": "string",
+          "const": "Keep the experience, decisions, and learning in your own words."
+        },
+        "replacementReflection": { "type": "null" }
+      }
+    },
+    "reflectionSupportEnvelope": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "generationType": { "const": "reflection_support" },
+            "data": { "$ref": "#/$defs/reflectionSupportData" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "draftSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sectionType", "title", "draftText", "sourceRecordIds", "draftLabel"],
+      "properties": {
+        "sectionType": {
+          "type": "string",
+          "enum": [
+            "project_summary",
+            "personal_motivation",
+            "process",
+            "challenges",
+            "outcomes",
+            "skills",
+            "intended_major_connection",
+            "future_development"
+          ]
+        },
+        "title": { "$ref": "#/$defs/shortText" },
+        "draftText": { "$ref": "#/$defs/nonEmptyText" },
+        "sourceRecordIds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/uuid" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "draftLabel": {
+          "type": "string",
+          "const": "Draft—review for factual accuracy"
+        }
+      }
+    },
+    "dataGap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sectionType", "missingSourceTypes", "message"],
+      "properties": {
+        "sectionType": { "$ref": "#/$defs/shortText" },
+        "missingSourceTypes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/shortText" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "message": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "portfolioTextData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sections", "dataGaps", "overallDraftLabel"],
+      "properties": {
+        "sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/draftSection" },
+          "maxItems": 8
+        },
+        "dataGaps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/dataGap" },
+          "maxItems": 8
+        },
+        "overallDraftLabel": {
+          "type": "string",
+          "const": "Editable portfolio draft generated only from eligible stored records."
+        }
+      }
+    },
+    "portfolioTextEnvelope": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "generationType": { "const": "portfolio_text" },
+            "data": { "$ref": "#/$defs/portfolioTextData" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "answerPlanningNote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question", "planningNotes", "sourceRecordIds"],
+      "properties": {
+        "question": { "$ref": "#/$defs/nonEmptyText" },
+        "planningNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 1,
+          "maxItems": 6
+        },
+        "sourceRecordIds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/uuid" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "presentationData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pitch30",
+        "explanation90",
+        "presentation3m",
+        "interviewQuestions",
+        "answerPlanningNotes",
+        "challengingFollowUps",
+        "draftLabel"
+      ],
+      "properties": {
+        "pitch30": { "type": "string", "minLength": 1, "maxLength": 900 },
+        "explanation90": { "type": "string", "minLength": 1, "maxLength": 2200 },
+        "presentation3m": { "type": "string", "minLength": 1, "maxLength": 5000 },
+        "interviewQuestions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "answerPlanningNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/answerPlanningNote" },
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "challengingFollowUps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "draftLabel": {
+          "type": "string",
+          "const": "Editable presentation draft—review every factual statement."
+        }
+      }
+    },
+    "presentationEnvelope": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "generationType": { "const": "presentation" },
+            "data": { "$ref": "#/$defs/presentationData" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "verifiedExample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "sourceRecordIds"],
+      "properties": {
+        "statement": { "$ref": "#/$defs/nonEmptyText" },
+        "sourceRecordIds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/uuid" },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "recommendationEvidenceData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "warning",
+        "projectContext",
+        "studentResponsibilities",
+        "initiativeExamples",
+        "organizationExamples",
+        "problemSolvingExamples",
+        "resilienceExamples",
+        "communicationExamples",
+        "measurableResults",
+        "verifiedEvidenceReferences",
+        "voice"
+      ],
+      "properties": {
+        "warning": {
+          "type": "string",
+          "const": "This document provides evidence for a recommender. It is not a recommendation letter and must not contain invented observations."
+        },
+        "projectContext": { "$ref": "#/$defs/verifiedExample" },
+        "studentResponsibilities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/verifiedExample" }
+        },
+        "initiativeExamples": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/verifiedExample" }
+        },
+        "organizationExamples": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/verifiedExample" }
+        },
+        "problemSolvingExamples": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/verifiedExample" }
+        },
+        "resilienceExamples": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/verifiedExample" }
+        },
+        "communicationExamples": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/verifiedExample" }
+        },
+        "measurableResults": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/verifiedExample" }
+        },
+        "verifiedEvidenceReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceRecord" },
+          "uniqueItems": true
+        },
+        "voice": {
+          "type": "string",
+          "const": "neutral_evidence_summary"
+        }
+      }
+    },
+    "recommendationEvidenceEnvelope": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "generationType": { "const": "recommendation_evidence" },
+            "data": { "$ref": "#/$defs/recommendationEvidenceData" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  },
+  "examples": [
+    {
+      "schemaVersion": "1.0.0",
+      "generationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "generationType": "reflection_support",
+      "locale": "en",
+      "data": {
+        "followUpQuestions": [
+          "What specific decision did you make after visibility affected your first observation?"
+        ],
+        "vaguePhrases": [
+          {
+            "phrase": "It went well",
+            "reason": "The phrase does not identify an action, result, or difficulty.",
+            "followUpQuestion": "What happened that made you describe the session as going well?"
+          }
+        ],
+        "concreteExampleRequests": [
+          "Name one change you made to the observation sheet."
+        ],
+        "actionLearningDistinctions": [
+          "Organizing the notes is an action; recognizing the need to record uncertainty is learning."
+        ],
+        "structureSuggestions": [
+          "Describe the situation, your decision, the evidence, and what you will do next."
+        ],
+        "evidenceQuestions": [
+          "Which dated field note shows the change?"
+        ],
+        "ownershipReminder": "Keep the experience, decisions, and learning in your own words.",
+        "replacementReflection": null
+      },
+      "provenance": {
+        "sourceRecords": [
+          {
+            "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+            "type": "reflection",
+            "status": "student_reported"
+          }
+        ],
+        "guidanceLabel": "Editable guidance generated from authorized PortfolioPath records.",
+        "warnings": [],
+        "unsupportedClaims": [],
+        "fallbackUsed": false,
+        "requiresFactualConfirmation": true
+      }
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "generationId": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "generationType": "recommendation_evidence",
+      "locale": "en",
+      "data": {
+        "warning": "This document provides evidence for a recommender. It is not a recommendation letter and must not contain invented observations.",
+        "projectContext": {
+          "statement": "The student completed a marine observation documentation project.",
+          "sourceRecordIds": ["dddddddd-dddd-4ddd-8ddd-dddddddddddd"]
+        },
+        "studentResponsibilities": [
+          {
+            "statement": "The student organized dated observations and recorded measurement context.",
+            "sourceRecordIds": ["eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee"]
+          }
+        ],
+        "initiativeExamples": [],
+        "organizationExamples": [
+          {
+            "statement": "The student maintained a structured field log.",
+            "sourceRecordIds": ["eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee"]
+          }
+        ],
+        "problemSolvingExamples": [],
+        "resilienceExamples": [],
+        "communicationExamples": [],
+        "measurableResults": [],
+        "verifiedEvidenceReferences": [
+          {
+            "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+            "type": "evidence",
+            "status": "accepted"
+          }
+        ],
+        "voice": "neutral_evidence_summary"
+      },
+      "provenance": {
+        "sourceRecords": [
+          {
+            "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+            "type": "project",
+            "status": "approved"
+          },
+          {
+            "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+            "type": "evidence",
+            "status": "accepted"
+          }
+        ],
+        "guidanceLabel": "Editable guidance generated from authorized PortfolioPath records.",
+        "warnings": [
+          "Only reviewed evidence and counselor-confirmed skills may be presented as verified."
+        ],
+        "unsupportedClaims": [],
+        "fallbackUsed": false,
+        "requiresFactualConfirmation": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --radius: 0.45rem;
+  --background: #f7f8fa;
+  --foreground: #16202a;
+  --card: #ffffff;
+  --card-foreground: #16202a;
+  --popover: #ffffff;
+  --popover-foreground: #16202a;
+  --primary: #071b33;
+  --primary-foreground: #ffffff;
+  --secondary: #244e78;
+  --secondary-foreground: #ffffff;
+  --muted: #edf1f5;
+  --muted-foreground: #637083;
+  --accent: #c6a15b;
+  --accent-foreground: #071b33;
+  --destructive: #b84242;
+  --border: #dce2e9;
+  --input: #cbd3dc;
+  --ring: #244e78;
+  --success: #287a55;
+  --warning: #b46c24;
+  --sidebar: #071b33;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #244e78;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #102e4d;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #24415f;
+  --sidebar-ring: #c6a15b;
+}
+
+* { border-color: var(--border); }
+body { background: var(--background); color: var(--foreground); font-family: "Inter", Arial, sans-serif; }
+h1, h2, h3, h4 { font-family: "Sora", Arial, sans-serif; letter-spacing: -0.025em; }
+button, a, input, textarea, select { outline-offset: 3px; }
+::selection { background: color-mix(in srgb, var(--accent) 42%, white); }
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}

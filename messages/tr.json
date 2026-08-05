@@ -1,0 +1,5 @@
+{
+  "brand": "PortfolioPath",
+  "nav": { "how": "Nasıl çalışır", "students": "Öğrenciler", "counselors": "Danışmanlar", "pricing": "Fiyatlandırma", "login": "Giriş yap", "start": "Ücretsiz başla" },
+  "hero": { "title": "Yapay etkinlikler değil, belgelenmiş üniversite portföy projeleri oluştur.", "body": "Gerçek ilgi alanlarını kanıt, öz değerlendirme ve danışman incelemesiyle yapılandırılmış projelere dönüştür.", "student": "Öğrenci olarak başla", "counselor": "Danışmanlar için" }
+}

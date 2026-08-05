@@ -1,0 +1,5 @@
+import "./entitlements.test"
+import "./file-security.test"
+import "./generation.test"
+import "./project-state.test"
+import "./security.test"

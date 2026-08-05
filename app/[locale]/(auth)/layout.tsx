@@ -1,0 +1,6 @@
+import { Brand } from "@/components/brand"
+
+export default async function AuthLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  return <main id="main" className="grid min-h-screen bg-background lg:grid-cols-[1fr_1.05fr]"><section className="hidden bg-primary p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-between"><Brand locale={locale} inverse/><div className="max-w-xl"><p className="mb-5 text-sm font-semibold tracking-[.18em] text-accent uppercase">Evidence-first portfolio building</p><h1 className="text-4xl leading-tight font-semibold">Build documented university portfolio projects—not artificial extracurricular activities.</h1><p className="mt-5 leading-7 text-primary-foreground/70">Plan honest work, preserve its evidence, reflect on your decisions, and share only what you can substantiate.</p></div><p className="text-sm text-primary-foreground/60">Private by default · Revocable sharing · No admissions guarantees</p></section><section className="flex min-h-screen items-center justify-center p-5 md:p-10"><div className="w-full max-w-lg"><div className="mb-8 lg:hidden"><Brand locale={locale}/></div>{children}</div></section></main>
+}

@@ -1,0 +1,3 @@
+import Link from "next/link"
+import { Brand } from "@/components/brand"
+export function SiteFooter({ locale }: { locale: string }) { return <footer className="border-t bg-card"><div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 md:grid-cols-[1fr_auto] lg:px-8"><div className="flex flex-col gap-3"><Brand locale={locale}/><p className="max-w-md text-sm text-muted-foreground">Guidance for authentic, evidence-backed student work. PortfolioPath never guarantees admission or scholarships.</p></div><nav className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm"><Link href={`/${locale}/ethical-use`}>Ethical use</Link><Link href={`/${locale}/privacy`}>Privacy</Link><Link href={`/${locale}/terms`}>Terms</Link><Link href={`/${locale}/pricing`}>Pricing</Link></nav></div></footer> }

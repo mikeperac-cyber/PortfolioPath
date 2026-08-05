@@ -1,0 +1,4 @@
+import { expect,test } from "@playwright/test"
+test("landing communicates evidence-first positioning",async({page})=>{await page.goto("/en");await expect(page.getByRole("heading",{level:1})).toContainText("Build documented university portfolio projects");await expect(page.getByText("Private by default",{exact:true})).toBeVisible();await expect(page.getByText(/admissions guarantees/i)).toBeVisible()})
+test("public product and policy pages are reachable",async({page})=>{for(const path of ["how-it-works","students","counselors","pricing","ethical-use","privacy","terms"]){await page.goto(`/en/${path}`);await expect(page.getByRole("heading",{level:1})).toBeVisible()}})
+test("registration supports separate student and counselor paths",async({page})=>{await page.goto("/en/register?role=counselor");await expect(page.getByRole("button",{name:"Counselor"})).toBeVisible();await expect(page.getByText(/approval is required/i)).toBeVisible()})

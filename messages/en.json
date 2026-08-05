@@ -1,0 +1,5 @@
+{
+  "brand": "PortfolioPath",
+  "nav": { "how": "How it works", "students": "Students", "counselors": "Counselors", "pricing": "Pricing", "login": "Log in", "start": "Get started" },
+  "hero": { "title": "Build documented university portfolio projects—not artificial extracurricular activities.", "body": "Turn genuine interests into structured projects with clear evidence, reflection, and counselor review.", "student": "Start as a student", "counselor": "For counselors" }
+}

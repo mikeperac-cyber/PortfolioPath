@@ -1,0 +1,8 @@
+import { NextResponse } from "next/server"
+import { z } from "zod"
+import { getApiContext, invalid } from "@/lib/api-auth"
+import { createShareToken, hashShareToken } from "@/lib/security"
+import { shareLinkSchema } from "@/lib/validation"
+export async function POST(request:Request){try{const input=shareLinkSchema.parse(await request.json());const context=await getApiContext(["student"]);if(context.error)return context.error;const {supabase,user}=context;const {data:page}=await supabase.from("portfolio_pages").select("id,confirmed_at").eq("id",input.portfolioPageId).eq("student_id",user.id).single();if(!page)return NextResponse.json({error:"Portfolio page not found."},{status:404});if(!page.confirmed_at)return NextResponse.json({error:"Confirm factual accuracy before sharing."},{status:422});const token=createShareToken();const expiresAt=new Date(Date.now()+input.expiresInDays*86_400_000).toISOString();const {data,error}=await supabase.from("share_links").insert({portfolio_page_id:page.id,student_id:user.id,token_hash:hashShareToken(token),expires_at:expiresAt}).select("id").single();if(error)throw error;return NextResponse.json({id:data.id,url:`${new URL(request.url).origin}/share/${token}`,expiresAt},{status:201})}catch(error){return invalid(error)}}
+const revokeSchema=z.object({id:z.string().uuid()})
+export async function DELETE(request:Request){try{const input=revokeSchema.parse(await request.json());const context=await getApiContext(["student"]);if(context.error)return context.error;const {error}=await context.supabase.from("share_links").update({revoked_at:new Date().toISOString()}).eq("id",input.id).eq("student_id",context.user.id);if(error)throw error;return NextResponse.json({revoked:true})}catch(error){return invalid(error)}}

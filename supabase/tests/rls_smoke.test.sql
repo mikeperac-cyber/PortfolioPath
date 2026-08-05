@@ -1,0 +1,10 @@
+begin;
+select plan(6);
+select has_table('public','projects','projects table exists');
+select has_table('public','evidence','evidence table exists');
+select ok((select c.relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relname='projects'),'projects has row-level security enabled');
+select ok((select c.relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relname='evidence'),'evidence has row-level security enabled');
+select policies_are('public','projects',array['projects_delete','projects_insert','projects_select','projects_update']);
+select policies_are('public','evidence',array['evidence_admin_flagged_select','evidence_select','evidence_student_all']);
+select * from finish();
+rollback;
