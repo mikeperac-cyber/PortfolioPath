@@ -2,18 +2,24 @@ import { NextResponse } from "next/server"
 import { getApiContext } from "@/lib/api-auth"
 
 export const dynamic = "force-dynamic"
+export const revalidate = 30
 
 export async function GET() {
   const context = await getApiContext(["student"])
   if (context.error) return context.error
   const { supabase, user } = context
+
   const [{ data: profile, error: profileError }, { data: projects, error: projectsError }] = await Promise.all([
-    supabase.from("student_profiles").select("onboarding_completed, onboarding_step, intended_major, target_application_year").eq("user_id", user.id).maybeSingle(),
+    supabase.from("student_profiles").select("onboarding_completed, intended_major, target_application_year").eq("user_id", user.id).maybeSingle(),
     supabase.from("projects").select("id,title,status,start_date,end_date,main_objective,final_deliverable,updated_at,created_at").eq("student_id", user.id).order("updated_at", { ascending: false }),
   ])
   if (profileError || projectsError) return NextResponse.json({ error: "Your workspace could not be loaded." }, { status: 500 })
   const projectIds = (projects ?? []).map((project) => project.id)
-  if (!projectIds.length) return NextResponse.json({ profile, projects: [], weeks: [], tasks: [], evidence: [], reflections: [], skills: [], comments: [], portfolios: [], mentors: [], parents: [] })
+  if (!projectIds.length) {
+    const response = NextResponse.json({ profile, projects: [], weeks: [], tasks: [], evidence: [], reflections: [], skills: [], comments: [], portfolios: [], mentors: [], parents: [] })
+    response.headers.set("Cache-Control", "private, max-age=30, stale-while-revalidate=60")
+    return response
+  }
 
   const [weeksResult, tasksResult, evidenceResult, reflectionsResult, skillsResult, commentsResult, portfoliosResult, mentorsResult, parentsResult] = await Promise.all([
     supabase.from("project_weeks").select("id,project_id,week_number,milestone,starts_on,ends_on").in("project_id", projectIds).order("week_number"),
@@ -29,7 +35,7 @@ export async function GET() {
   const errors = [weeksResult.error, tasksResult.error, evidenceResult.error, reflectionsResult.error, skillsResult.error, commentsResult.error, portfoliosResult.error, mentorsResult.error, parentsResult.error].filter(Boolean)
   if (errors.length) return NextResponse.json({ error: "Some private workspace records could not be loaded." }, { status: 500 })
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     profile,
     projects: projects ?? [],
     weeks: weeksResult.data ?? [],
@@ -42,4 +48,7 @@ export async function GET() {
     mentors: mentorsResult.data ?? [],
     parents: parentsResult.data ?? [],
   })
+
+  response.headers.set("Cache-Control", "private, max-age=30, stale-while-revalidate=60")
+  return response
 }

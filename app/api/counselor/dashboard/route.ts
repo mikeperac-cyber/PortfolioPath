@@ -3,15 +3,21 @@ import { getApiContext } from "@/lib/api-auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 export const dynamic = "force-dynamic"
+export const revalidate = 60
 
 export async function GET() {
   const context = await getApiContext(["counselor"])
   if (context.error) return context.error
   const { supabase, user } = context
+
   const { data: assignments, error: assignmentsError } = await supabase.from("counselor_student_assignments").select("student_id,assigned_at").eq("counselor_id", user.id).eq("active", true)
   if (assignmentsError) return NextResponse.json({ error: "Assigned students could not be loaded." }, { status: 500 })
   const studentIds = (assignments ?? []).map((assignment) => assignment.student_id)
-  if (!studentIds.length) return NextResponse.json({ students: [], projects: [], tasks: [], evidence: [], reflections: [], skills: [] })
+  if (!studentIds.length) {
+    const response = NextResponse.json({ students: [], projects: [], tasks: [], evidence: [], reflections: [], skills: [] })
+    response.headers.set("Cache-Control", "private, max-age=60, stale-while-revalidate=120")
+    return response
+  }
   const admin = createAdminClient()
   const { data: projects, error: projectsError } = await supabase.from("projects").select("id,student_id,title,status,main_objective,updated_at").in("student_id", studentIds).order("updated_at", { ascending: false })
   if (projectsError) return NextResponse.json({ error: "Assigned projects could not be loaded." }, { status: 500 })
@@ -31,5 +37,8 @@ export async function GET() {
     const incomplete = (tasks ?? []).filter((task) => studentProjects.some((project) => project.id === task.project_id) && task.status !== "complete" && task.due_at && new Date(task.due_at).getTime() < Date.now()).length
     return { id: studentId, name: account?.full_name || "Student", accountStatus: account?.status ?? "active", intendedMajor: profile?.intended_major ?? "Not set", applicationYear: profile?.target_application_year ?? null, onboardingCompleted: Boolean(profile?.onboarding_completed), overdueTasks: incomplete, projectCount: studentProjects.length }
   })
-  return NextResponse.json({ students: studentRows, projects: projects ?? [], tasks: tasks ?? [], evidence: evidence ?? [], reflections: reflections ?? [], skills: skills ?? [] })
+
+  const response = NextResponse.json({ students: studentRows, projects: projects ?? [], tasks: tasks ?? [], evidence: evidence ?? [], reflections: reflections ?? [], skills: skills ?? [] })
+  response.headers.set("Cache-Control", "private, max-age=60, stale-while-revalidate=120")
+  return response
 }

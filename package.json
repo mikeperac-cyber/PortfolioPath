@@ -22,8 +22,6 @@
     "bootstrap-owner": "tsx scripts/bootstrap-owner.ts"
   },
   "dependencies": {
-    "@fontsource/inter": "5.2.8",
-    "@fontsource/sora": "5.2.8",
     "@hookform/resolvers": "5.7.1",
     "@react-pdf/renderer": "4.5.1",
     "@supabase/ssr": "0.12.4",
