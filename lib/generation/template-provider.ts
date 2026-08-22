@@ -165,7 +165,7 @@ export class TemplateGenerationProvider implements GenerationProvider {
       pitch30: `I created ${title} to ${objective}. I documented my decisions, evidence, and what changed along the way.`,
       explanation90: `${title} began with a genuine question. My objective was to ${objective}. I planned weekly work, kept evidence, reflected on challenges, and revised the project when the evidence required it.`,
       presentation3m: `Introduce the motivation for ${title}, explain the objective, describe verified actions in sequence, show selected evidence, discuss one challenge and adaptation, then close with what you learned and what you would do next.`,
-      interviewQuestions: ["Why did you choose this project?", "What changed from your original plan?", "Which evidence best represents your contribution?", "What was your most difficult decision?", "What would you develop next?"],
+      interviewQuestions: ["Why did you choose this project?", "What changed from your original plan?", "Which evidence best represents your contribution?", "What was your most difficult decision?", "How did you demonstrate sustained commitment?", "How does this connect to your intellectual curiosity?"],
       answerNotes: ["Use one concrete example per answer.", "Distinguish plans from completed work.", "Name uncertainty rather than exaggerating impact."],
     }
     return wrap(data, context)
@@ -173,7 +173,7 @@ export class TemplateGenerationProvider implements GenerationProvider {
 
   async recommendationEvidence(input: Record<string, unknown>, context: GenerationContext) {
     const data: RecommendationEvidence = {
-      warning: "This document provides evidence for a recommender. It is not a recommendation letter and must not contain invented observations.",
+      warning: "This document provides evidence for a recommender. It is not a recommendation letter and must not contain invented observations. Focus on verifiable impact and initiative relevant for US college applications.",
       context: text(input, "context", "Project context is drawn from verified PortfolioPath records."),
       completedActions: list(input, "completedActions"),
       initiativeEvidence: list(input, "initiativeEvidence"),

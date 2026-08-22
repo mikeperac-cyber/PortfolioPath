@@ -1298,6 +1298,9 @@ function Portfolio() {
           <Button disabled variant="outline">
             Create 30-day link
           </Button>
+          <Button disabled variant="secondary">
+            Export for Common App (Activity List format)
+          </Button>
         </CardFooter>
       </Card>
     </>
