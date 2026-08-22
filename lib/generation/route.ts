@@ -107,6 +107,7 @@ async function runGeneration(type: GenerationType, input: Record<string, unknown
     case "personal_statement_connection": return provider.personalStatementConnection(input, context)
     case "interview_preparation": return provider.interviewPreparation(input, context)
     case "progress_summary": return provider.progressSummary(input, context)
+    case "admissions_export": return provider.admissionsExport(input, context)
   }
 }
 

@@ -3,6 +3,7 @@ import { ArrowRightIcon, CheckCircle2Icon, FileCheck2Icon, FolderLockIcon, ListC
 import { getTranslations } from "next-intl/server"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { MarketingHeader } from "@/components/marketing-header"
 import { SiteFooter } from "@/components/site-footer"
@@ -105,5 +106,91 @@ export async function LandingPage({ locale }: { locale: string }) {
           </div>
         </div>
       </section>
+
+      <section className="bg-card border-y border-muted">
+        <div className="mx-auto max-w-7xl px-5 py-18 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-semibold text-primary">Interactive Project Sandbox</h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Explore what a completed, verified portfolio looks like before you sign up.
+            </p>
+          </div>
+
+          <div className="rounded-xl border bg-background shadow-lg overflow-hidden flex flex-col md:flex-row">
+            {/* Sidebar / Navigation */}
+            <div className="bg-muted/30 w-full md:w-64 p-6 border-r flex flex-col gap-4">
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldCheckIcon className="size-5 text-success" />
+                <span className="font-semibold text-sm">Verified Portfolio</span>
+              </div>
+              <button className="text-left px-3 py-2 rounded-md bg-background shadow-sm border text-sm font-medium text-primary">Executive Summary</button>
+              <button className="text-left px-3 py-2 rounded-md hover:bg-background/50 text-sm font-medium text-muted-foreground transition-colors">Field Notes & Evidence</button>
+              <button className="text-left px-3 py-2 rounded-md hover:bg-background/50 text-sm font-medium text-muted-foreground transition-colors">Counselor Attestations</button>
+              <button className="text-left px-3 py-2 rounded-md hover:bg-background/50 text-sm font-medium text-muted-foreground transition-colors">Common App Export</button>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 p-8">
+              <div className="flex items-start justify-between mb-8">
+                <div>
+                  <h3 className="text-2xl font-semibold">Community Oral History Archive</h3>
+                  <p className="text-muted-foreground mt-1">Preserving neighborhood history through 12 elder interviews.</p>
+                </div>
+                <div className="flex gap-2">
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                    <CheckCircle2Icon className="mr-1 size-3" /> Counselor Verified
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                <div>
+                  <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">Project Timeline</h4>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="flex-1 h-2 bg-success rounded-full"></div>
+                    <span className="text-muted-foreground font-medium">8 Weeks Complete</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex justify-between">
+                        Audio Transcripts
+                        <FileCheck2Icon className="size-4 text-muted-foreground" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">40 hours of raw interview audio cleanly transcribed and coded by theme.</p>
+                      <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                        <span className="text-xs font-medium text-accent">Self-Reported Evidence</span>
+                        <Button variant="ghost" size="sm" className="h-7 text-xs">View Files</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="shadow-sm border-success/30 bg-success/5">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex justify-between">
+                        Methodology Review
+                        <ShieldCheckIcon className="size-4 text-success" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">&quot;Student demonstrated exceptional rigor in securing consent and structuring interview questions.&quot;</p>
+                      <div className="mt-4 pt-4 border-t border-success/20 flex justify-between items-center">
+                        <span className="text-xs font-medium text-success flex items-center gap-1">
+                          <CheckCircle2Icon className="size-3" /> Counselor Attestation
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
 </main><SiteFooter locale={locale}/></>
 }

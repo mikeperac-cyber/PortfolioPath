@@ -67,4 +67,19 @@ export interface GenerationProvider {
   personalStatementConnection(input: Record<string, unknown>, context: GenerationContext): Promise<GeneratedResult<PersonalStatementConnection>>
   interviewPreparation(input: Record<string, unknown>, context: GenerationContext): Promise<GeneratedResult<InterviewPreparation>>
   progressSummary(input: Record<string, unknown>, context: GenerationContext): Promise<GeneratedResult<ProgressSummary>>
+  admissionsExport(input: Record<string, unknown>, context: GenerationContext): Promise<GeneratedResult<AdmissionsExport>>
+}
+
+export interface AdmissionsExport {
+  commonAppActivity: {
+    position: string;
+    organization: string;
+    description: string;
+    participationGradeLevels: string[];
+    timingOfParticipation: string;
+    hoursSpentPerWeek: number;
+    weeksSpentPerYear: number;
+  };
+  ucPiqBulletPoints: string[];
+  academicAbstract: string;
 }

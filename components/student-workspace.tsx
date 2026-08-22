@@ -1107,8 +1107,7 @@ function Reflections() {
               <CardHeader>
                 <CardTitle className="capitalize">{type} reflection</CardTitle>
                 <CardDescription>
-                  What did you complete? What was difficult? What decision did
-                  you make? What evidence shows progress? What will you do next?
+                  What unexpected variable changed your approach? What data contradicted your initial hypothesis? If you had another month, what would you re-test?
                 </CardDescription>
               </CardHeader>
               <CardContent>

@@ -16,3 +16,4 @@ export type GenerationType =
   | "personal_statement_connection"
   | "interview_preparation"
   | "progress_summary"
+  | "admissions_export"
