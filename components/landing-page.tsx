@@ -1,8 +1,10 @@
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowRightIcon, CheckCircle2Icon, FileCheck2Icon, FolderLockIcon, ListChecksIcon, ShieldCheckIcon } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { MarketingHeader } from "@/components/marketing-header"
 import { SiteFooter } from "@/components/site-footer"
@@ -64,6 +66,96 @@ export async function LandingPage({ locale }: { locale: string }) {
         </div>
       </section>
 
+
+      <section className="bg-muted py-18">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-semibold text-primary">Discover Authentic Projects</h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              See what structured planning and verified evidence look like in practice.
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="group overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md">
+              <div className="aspect-[4/3] w-full overflow-hidden bg-muted relative">
+                <Image
+                  src="https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=800&auto=format&fit=crop"
+                  alt="Students organizing archive materials"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute top-3 right-3">
+                  <Badge className="bg-background/90 text-foreground backdrop-blur-sm shadow-sm hover:bg-background/90 border-0">History</Badge>
+                </div>
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-semibold text-primary">Community Oral History Archive</h3>
+                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">Documented neighborhood history through 12 elder interviews, preserving 40 hours of primary source audio.</p>
+                <div className="mt-4 flex items-center justify-between border-t pt-4">
+                  <div className="flex -space-x-2">
+                    <div className="size-6 rounded-full border-2 border-background bg-secondary/30 flex items-center justify-center text-[10px] font-medium text-secondary">11</div>
+                    <div className="size-6 rounded-full border-2 border-background bg-secondary/30 flex items-center justify-center text-[10px] font-medium text-secondary">12</div>
+                  </div>
+                  <span className="text-xs font-medium text-success flex items-center gap-1"><CheckCircle2Icon className="size-3"/> Verified</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="group overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md">
+              <div className="aspect-[4/3] w-full overflow-hidden bg-muted relative">
+                <Image
+                  src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=800&auto=format&fit=crop"
+                  alt="Student coding on laptop"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute top-3 right-3">
+                  <Badge className="bg-background/90 text-foreground backdrop-blur-sm shadow-sm hover:bg-background/90 border-0">Computer Science</Badge>
+                </div>
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-semibold text-primary">Accessible Campus Map</h3>
+                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">Designed and coded an accessibility-focused map of the local community center with verified user feedback.</p>
+                <div className="mt-4 flex items-center justify-between border-t pt-4">
+                  <div className="flex -space-x-2">
+                    <div className="size-6 rounded-full border-2 border-background bg-secondary/30 flex items-center justify-center text-[10px] font-medium text-secondary">10</div>
+                  </div>
+                  <span className="text-xs font-medium text-success flex items-center gap-1"><CheckCircle2Icon className="size-3"/> Verified</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="group overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md md:col-span-2 lg:col-span-1">
+              <div className="aspect-[4/3] w-full overflow-hidden bg-muted relative">
+                <Image
+                  src="https://images.unsplash.com/photo-1592424001806-031e345e6914?q=80&w=800&auto=format&fit=crop"
+                  alt="Community garden harvest"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute top-3 right-3">
+                  <Badge className="bg-background/90 text-foreground backdrop-blur-sm shadow-sm hover:bg-background/90 border-0">Environmental Science</Badge>
+                </div>
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-semibold text-primary">Community Garden Yield Analysis</h3>
+                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">Implemented a data tracking system for a local community garden to optimize planting schedules based on 10 weeks of field data.</p>
+                <div className="mt-4 flex items-center justify-between border-t pt-4">
+                  <div className="flex -space-x-2">
+                    <div className="size-6 rounded-full border-2 border-background bg-secondary/30 flex items-center justify-center text-[10px] font-medium text-secondary">12</div>
+                  </div>
+                  <span className="text-xs font-medium text-success flex items-center gap-1"><CheckCircle2Icon className="size-3"/> Verified</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="bg-card">
         <div className="mx-auto max-w-7xl px-5 py-18 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2 items-center">
@@ -105,5 +197,91 @@ export async function LandingPage({ locale }: { locale: string }) {
           </div>
         </div>
       </section>
+
+      <section className="bg-card border-y border-muted">
+        <div className="mx-auto max-w-7xl px-5 py-18 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-semibold text-primary">Interactive Project Sandbox</h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Explore what a completed, verified portfolio looks like before you sign up.
+            </p>
+          </div>
+
+          <div className="rounded-xl border bg-background shadow-lg overflow-hidden flex flex-col md:flex-row">
+            {/* Sidebar / Navigation */}
+            <div className="bg-muted/30 w-full md:w-64 p-6 border-r flex flex-col gap-4">
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldCheckIcon className="size-5 text-success" />
+                <span className="font-semibold text-sm">Verified Portfolio</span>
+              </div>
+              <button className="text-left px-3 py-2 rounded-md bg-background shadow-sm border text-sm font-medium text-primary">Executive Summary</button>
+              <button className="text-left px-3 py-2 rounded-md hover:bg-background/50 text-sm font-medium text-muted-foreground transition-colors">Field Notes & Evidence</button>
+              <button className="text-left px-3 py-2 rounded-md hover:bg-background/50 text-sm font-medium text-muted-foreground transition-colors">Counselor Attestations</button>
+              <button className="text-left px-3 py-2 rounded-md hover:bg-background/50 text-sm font-medium text-muted-foreground transition-colors">Common App Export</button>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 p-8">
+              <div className="flex items-start justify-between mb-8">
+                <div>
+                  <h3 className="text-2xl font-semibold">Community Oral History Archive</h3>
+                  <p className="text-muted-foreground mt-1">Preserving neighborhood history through 12 elder interviews.</p>
+                </div>
+                <div className="flex gap-2">
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                    <CheckCircle2Icon className="mr-1 size-3" /> Counselor Verified
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                <div>
+                  <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">Project Timeline</h4>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="flex-1 h-2 bg-success rounded-full"></div>
+                    <span className="text-muted-foreground font-medium">8 Weeks Complete</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex justify-between">
+                        Audio Transcripts
+                        <FileCheck2Icon className="size-4 text-muted-foreground" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">40 hours of raw interview audio cleanly transcribed and coded by theme.</p>
+                      <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                        <span className="text-xs font-medium text-accent">Self-Reported Evidence</span>
+                        <Button variant="ghost" size="sm" className="h-7 text-xs">View Files</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="shadow-sm border-success/30 bg-success/5">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex justify-between">
+                        Methodology Review
+                        <ShieldCheckIcon className="size-4 text-success" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">&quot;Student demonstrated exceptional rigor in securing consent and structuring interview questions.&quot;</p>
+                      <div className="mt-4 pt-4 border-t border-success/20 flex justify-between items-center">
+                        <span className="text-xs font-medium text-success flex items-center gap-1">
+                          <CheckCircle2Icon className="size-3" /> Counselor Attestation
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
 </main><SiteFooter locale={locale}/></>
 }

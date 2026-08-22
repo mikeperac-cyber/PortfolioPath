@@ -45,7 +45,8 @@ export function Roster({ data }: { data: ReviewData }) {
         const matchesFilter =
           filter === "all" ||
           (filter === "overdue" && student.overdueTasks > 0) ||
-          (filter === "onboarding" && !student.onboardingCompleted);
+          (filter === "onboarding" && !student.onboardingCompleted) ||
+          (filter === "stalled" && (student as typeof student & { stalled?: boolean }).stalled);
         return matchesQuery && matchesFilter;
       }),
     [data.students, filter, query],
@@ -82,6 +83,7 @@ export function Roster({ data }: { data: ReviewData }) {
                 <SelectItem value="onboarding">
                   Onboarding incomplete
                 </SelectItem>
+                <SelectItem value="stalled">Stalled projects</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -97,6 +99,7 @@ export function Roster({ data }: { data: ReviewData }) {
                 <TableHead>Intended major</TableHead>
                 <TableHead>Projects</TableHead>
                 <TableHead>Overdue</TableHead>
+                <TableHead>Health Indicator</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -111,6 +114,21 @@ export function Roster({ data }: { data: ReviewData }) {
                       <Badge variant="secondary">{student.overdueTasks}</Badge>
                     ) : (
                       <Badge variant="outline">0</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {(student as typeof student & { stalled?: boolean }).stalled ? (
+                      <Badge variant="destructive" className="bg-destructive/15 text-destructive hover:bg-destructive/15">
+                        Stalled &gt;10 days
+                      </Badge>
+                    ) : student.projectCount > 0 ? (
+                      <Badge variant="outline" className="border-success/30 text-success">
+                        Active
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-muted-foreground">
+                        No projects
+                      </Badge>
                     )}
                   </TableCell>
                 </TableRow>
